@@ -76,8 +76,10 @@ function restartUserTimer(user) {
         clearTimeout(userTimers[user]);
     }
 
-    userTimers[user] = setTimeout(() => {
-        console.log(`🕛 Tiempo de espera agotado para ${user}, reiniciando conversación.`);
+    userTimers[user] = setTimeout(async () => {
+        const userInfo = `🕛 Tiempo de espera agotado para ${user}, Gracias por comunicarse con nosotros.`;
+        console.log(userInfo);
+        await sendMessage(user, userInfo);
         delete userStates[user];
     }, 60 * 1000);
 }
