@@ -9,6 +9,7 @@ const TOKEN = process.env.WHATSAPP_TOKEN;
 const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
 
 const userStates = {};
+const userTimers = {};  
 
 // Webhook para recibir mensajes
 app.post("/webhook", async (req, res) => {
@@ -21,6 +22,8 @@ app.post("/webhook", async (req, res) => {
         const text = message.text?.body || "Mensaje vacío";
 
         console.log(`📩 Mensaje recibido de ${from}: ${text}`);
+
+        restartUserTimer(from);
 
         if (!userStates[from]) {
             userStates[from] = { stage: "waiting_cedula" };
@@ -61,10 +64,22 @@ async function sendMessage(to, text) {
             }
         );
 
-        console.log("✅ Mensaje enviado:", response.data);
+        console.log(`✅ Mensaje enviado a ${to}: ${body}`);
     } catch (error) {
-        console.error("❌ Error enviando mensaje:", error.response?.data || error.message);
+        console.error(`❌ Error enviando mensaje a ${to}:`, error.response?.data || error.message);
     }
+}
+
+// Función para reiniciar el temporizador de usuario
+function restartUserTimer(user) {
+    if (userTimers[user]) {
+        clearTimeout(userTimers[user]);
+    }
+
+    userTimers[user] = setTimeout(() => {
+        console.log(`🕛 Tiempo de espera agotado para ${user}, reiniciando conversación.`);
+        delete userStates[user];
+    }, 60 * 1000);
 }
 
 // Endpoint para la verificación del webhook
