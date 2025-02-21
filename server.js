@@ -4,9 +4,32 @@ const axios = require("axios");
 const app = express();
 const PORT = 3000;
 app.use(express.json());
+const mysql = require("mysql2/promise");
 
 const TOKEN = process.env.WHATSAPP_TOKEN;
 const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
+
+// Conexión a MySQL
+const pool = mysql.createPool({
+    host: process.env.DB_HOST,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+});
+
+// Función para obtener ciudades desde la base de datos
+async function obtenerCiudades() {
+    try {
+        const [rows] = await pool.query("select * from ciudad_cargos");
+        return rows;
+    } catch (error) {
+        console.error("❌ Error al obtener ciudades:", error);
+        return [];
+    }
+}
 
 const userStates = {};
 const userTimers = {};  
@@ -90,7 +113,10 @@ app.post("/webhook", async (req, res) => {
                 await sendMessage(from, "⚠️ El apellido ingresado no es válido. Asegúrate de escribir solo letras y al menos 3 caracteres.");
             }
         } else if (userStates[from].stage === "esperando_celular") {
-            
+            const ciudades = await obtenerCiudades();
+            const opcionesCiudades = ciudades.map(c => `\n${c.id}️⃣ ${c.Ciudad}`).join("");
+            console.log(opcionesCiudades)
+
             if (/^\d{10}$/.test(text)) {
                 userStates[from].data.celular = text;
                 userStates[from].stage = "esperando_ciudad";
@@ -127,12 +153,12 @@ app.post("/webhook", async (req, res) => {
                 userStates[from].stage = "esperando_cargo";
         
                 const userInfo = `
-                    📋 Datos Ingresados: \n\n
-                    🆔 Cédula ingresada: ${userStates[from].data.cedula}
+                    📋 Datos Ingresados:
+                    \n\n🆔 Cédula ingresada: ${userStates[from].data.cedula}
                     \n👤 Nombre ingresado: ${userStates[from].data.nombre}
                     \n🔠 Apellido ingresado: ${userStates[from].data.apellido}
                     \n📱 Celular ingresado: ${userStates[from].data.celular}
-                    \n📱 Ciudad de contacto ingresada: ${ciudad}
+                    \n📍 Ciudad de contacto ingresada: ${ciudad}
                     \n\n🔹 Los cargos ofertados son los siguientes, por favor indica el numero del cual quieres resivir informacion y ser agendado para una entrevista.
                 `;
         
@@ -200,5 +226,5 @@ app.get("/", (req, res) => {
 
 const server = app.listen(PORT, () => {
     const address = server.address();
-    console.log(`Servidor corriendo en http://localhost:${address.port}`);
+    console.log(`Servidor corriendo en el puerto ${address.port}`);
 });
