@@ -9,51 +9,23 @@ const mysql = require("mysql2/promise");
 const TOKEN = process.env.WHATSAPP_TOKEN;
 const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
 
-
-async function probarConexion() {
-    try {
-        const connection = await mysql.createConnection({
-            host: "sicteferias.from-co.net",
-            port: 3309,
-            user: "BryanUtria",
-            password: "Bry@n.98#",
-            database: "gestion_humana"
-        });
-
-        console.log("✅ Conexión exitosa a MySQL");
-        const [rows] = await connection.execute("SELECT NOW() AS fecha_actual");
-        console.log("Resultado de prueba:", rows);
-
-        await connection.end();
-        return "Conexión exitosa: " + JSON.stringify(rows);
-    } catch (error) {
-        console.error("❌ Error conectando a MySQL:", error);
-        return "Error: " + error.message;
-    }
-}
-
-// Nuevo endpoint para probar conexión desde el navegador
-app.get("/test-db", async (req, res) => {
-    const resultado = await probarConexion();
-    res.send(resultado);
-});
-
 // Conexión a MySQL
-const pool = mysql.createPool({
+const connection = mysql.createConnection({
     host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
     user: process.env.DB_USER,
     password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
+    database: process.env.DB_NAME
 });
+
+let ciudadesCache = [];
 
 // Función para obtener ciudades desde la base de datos
 async function obtenerCiudades() {
     try {
-        const [rows] = await pool.query("select * from ciudad_cargos");
-        return rows;
+        const [rows] = await connection.query("select * from ciudad_cargos");
+        ciudadesCache = rows;
+        return ciudadesCache;
     } catch (error) {
         console.error("❌ Error al obtener ciudades:", error);
         return [];
@@ -143,6 +115,7 @@ app.post("/webhook", async (req, res) => {
             }
         } else if (userStates[from].stage === "esperando_celular") {
             const ciudades = await obtenerCiudades();
+            console.log(ciudades)
             const opcionesCiudades = ciudades.map(c => `\n${c.id}️⃣ ${c.Ciudad}`).join("");
             console.log(opcionesCiudades)
 
