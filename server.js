@@ -106,7 +106,7 @@ app.post("/webhook", async (req, res) => {
                     📋 Datos Ingresados:
                     \n\n🆔 Cédula ingresada: ${userStates[from].data.cedula}
                     \n👤 Nombre ingresado: ${userStates[from].data.nombre}
-                    \n🔠 Apellido ingresado: ${text}
+                    \n🔠 Apellidos ingresado: ${text}
                     \n\n🔹 Por ultimo, por favor ingresa tu numero de celular:
                 `;
 
@@ -114,9 +114,6 @@ app.post("/webhook", async (req, res) => {
 
                 // // Aquí puedes llamar a una función para guardar en MySQL
                 // await saveToDatabase(userStates[from].data);
-
-                // // Limpiar el estado del usuario después de guardar
-                // delete userStates[from];
 
             } else {
                 await sendMessage(from, "⚠️ El apellido ingresado no es válido. Asegúrate de escribir solo letras y al menos 3 caracteres.");
@@ -139,7 +136,7 @@ app.post("/webhook", async (req, res) => {
                     📋 Datos Ingresados:
                     \n\n🆔 Cédula ingresada: ${userStates[from].data.cedula}
                     \n👤 Nombre ingresado: ${userStates[from].data.nombre}
-                    \n🔠 Apellido ingresado: ${userStates[from].data.apellido}
+                    \n🔠 Apellidos ingresado: ${userStates[from].data.apellido}
                     \n📱 Celular ingresado: ${text}
                     \n\n🔹 Ahora requerimos saber de que ciudad nos contactas para mostrarte los cargos que tenemos ofertados, por favor ingresa el numero de la ciudad de la cual nos contactas:
                     \n${opcionesCiudades}
@@ -173,18 +170,127 @@ app.post("/webhook", async (req, res) => {
 
                 const userInfo = `
                     📋 Datos Ingresados:
-                    \n\n🆔 Cédula ingresada: ${userStates[from].data.cedula}
-                    \n👤 Nombre ingresado: ${userStates[from].data.nombre}
-                    \n🔠 Apellido ingresado: ${userStates[from].data.apellido}
-                    \n📱 Celular ingresado: ${userStates[from].data.celular}
-                    \n📍 Ciudad de contacto ingresada: ${ciudadSeleccionada}
+                    \n\n📍 Ciudad de contacto ingresada: ${ciudadSeleccionada}
                     \n\n🔹 Los cargos ofertados son los siguientes, por favor indica el numero del cual quieres resivir informacion y ser agendado para una entrevista:
                     ${listaCargos || "\n⚠️ No hay cargos disponibles para esta ciudad."}
                 `;
 
                 await sendMessage(from, userInfo);
             } else {
-                await sendMessage(from, "⚠️ El numero de celular ingresado no es válido. Por favor, ingresa un número de la lista de ciudades.");
+                await sendMessage(from, "⚠️ El numero de la ciudad ingresado no es válido. Por favor, ingresa un número de la lista de ciudades.");
+            }
+
+        } else if (userStates[from].stage === "esperando_cargo") {
+
+            const cargosUnicas = [...new Set(ciudadesCache.map(c => c.Cargo))].sort();
+
+            const numeroIngresado = parseInt(text, 10);
+            if (numeroIngresado >= 1 && numeroIngresado <= cargosUnicas.length) {
+                const cargoSeleccionado = cargosUnicas[numeroIngresado - 1];
+
+                userStates[from].data.cargo = cargoSeleccionado;
+                userStates[from].stage = "esperando_detalleCargo";
+
+                let detalleCargo;
+
+                if (cargoSeleccionado === "Motorizados") {
+                    detalleCargo = "Detalle cargo Motorizados"
+                } else if (cargoSeleccionado === "Conductor") {
+                    detalleCargo = "Detalle cargo Conductor"
+                } else if (cargoSeleccionado === "Ayudante (Sin Moto)") {
+                    detalleCargo = "Detalle cargo Ayudante (Sin Moto)"
+                }
+                
+                const userInfo = `
+                    📋 Datos Ingresados:
+                    \n\n💼 Cargo ingresado: ${cargoSeleccionado}
+                    \n\n🔹 El detalle de la oferta es la siguiente:
+                    \n\n${detalleCargo}
+                    \n\n🔹 Por favor indicanos si quieres continuar con la oferta, coloca el numero segun tu respuesta:
+                    \n\n➊ Si
+                    \n➋ No
+                `;
+
+                await sendMessage(from, userInfo);
+
+            } else {
+                await sendMessage(from, "⚠️ El cargo ingresado no es válido. Por favor, ingresa un número de la lista de cargos.");
+            }
+
+        } else if (userStates[from].stage === "esperando_detalleCargo") {
+
+            const numeroIngresado = parseInt(text, 10);
+            if (numeroIngresado === "1") {
+
+                userStates[from].data.detalleCargo = "Si";
+                userStates[from].stage = "esperando_entrevista";
+                
+                const userInfo = `
+                    🔹 Por favor indicanos si quieres continuar con la oferta para el cargo de ${userStates[from].data.cargo}, coloca el numero segun tu respuesta:
+                    \n\n➊ Si
+                    \n➋ No
+                `;
+
+                await sendMessage(from, userInfo);
+
+            } else if (numeroIngresado === "2") {
+                userStates[from].data.detalleCargo = "No";
+                await sendMessage(from, "🙏 Gracias por comunicarse con nosotros.");
+                delete userStates[from];
+                delete userTimers[from];
+
+            } else {
+                await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice 1 para Si o 2 para No.");
+            }
+
+        } else if (userStates[from].stage === "esperando_entrevista") {
+
+            const numeroIngresado = parseInt(text, 10);
+            if (numeroIngresado === "1") {
+
+                userStates[from].data.detalleCargo = "Si";
+                userStates[from].stage = "Completado";
+                
+                const userInfo = `
+                    🔹 Deseas presentarte a una entrevista para mas informacion en (Nombre, direccion y las posibles horas segun la ciudad), coloca el numero segun tu respuesta:
+                    \n\n➊ Si
+                    \n➋ No
+                `;
+
+                await sendMessage(from, userInfo);
+
+            } else if (numeroIngresado === "2") {
+                userStates[from].data.detalleCargo = "No";
+                await sendMessage(from, "🙏 Gracias por comunicarse con nosotros.");
+                delete userStates[from];
+                delete userTimers[from];
+
+            } else {
+                await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice 1 para Si o 2 para No.");
+            }
+        } else if (userStates[from].stage === "Completado") {
+
+            const numeroIngresado = parseInt(text, 10);
+            if (numeroIngresado === "1") {
+
+                userStates[from].data.entrevista = "Si";
+
+                delete userStates[from];
+                
+                const userInfo = `
+                    🙏 Gracias por comunicarse con nosotros, te estaremos esperando en nuestras instalaciones.
+                `;
+
+                await sendMessage(from, userInfo);
+
+            } else if (numeroIngresado === "2") {
+                userStates[from].data.entrevista = "No";
+                await sendMessage(from, "🙏 Gracias por comunicarse con nosotros.");
+                delete userStates[from];
+                delete userTimers[from];
+
+            } else {
+                await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice 1 para Si o 2 para No.");
             }
         }
     }
