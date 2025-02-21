@@ -9,28 +9,35 @@ const mysql = require("mysql2/promise");
 const TOKEN = process.env.WHATSAPP_TOKEN;
 const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
 
-// Conexión a MySQL
-const connection = mysql.createConnection({
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME
-});
 
-let ciudadesCache = [];
-
-// Función para obtener ciudades desde la base de datos
 async function obtenerCiudades() {
     try {
-        const [rows] = await connection.query("select * from ciudad_cargos");
+        const connection = await mysql.createConnection({
+            host: process.env.DB_HOST,
+            port: process.env.DB_PORT,
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: process.env.DB_NAME
+        });
+
+        console.log("✅ Conexión exitosa a MySQL");
+        const [rows] = await connection.execute("select * from ciudad_cargos");
+        console.log("Resultado de prueba:", rows);
+
+        await connection.end();
         ciudadesCache = rows;
         return ciudadesCache;
     } catch (error) {
-        console.error("❌ Error al obtener ciudades:", error);
-        return [];
+        console.error("❌ Error conectando a MySQL:", error);
+        return "Error: " + error.message;
     }
 }
+
+// Nuevo endpoint para probar conexión desde el navegador
+app.get("/test-db", async (req, res) => {
+    const resultado = await obtenerCiudades();
+    res.send(resultado);
+});
 
 const userStates = {};
 const userTimers = {};  
@@ -60,8 +67,8 @@ app.post("/webhook", async (req, res) => {
                 userStates[from].stage = "esperando_nombre";
         
                 const userInfo = `
-                    📋 Datos Ingresados: \n\n
-                    🆔 Cédula ingresada: ${text}
+                    📋 Datos Ingresados:
+                    \n\n🆔 Cédula ingresada: ${text}
                     \n\n🔹 Ahora por favor, ingresa tu nombre para continuar.
                 `;
         
@@ -77,8 +84,8 @@ app.post("/webhook", async (req, res) => {
                 userStates[from].stage = "esperando_apellido";
         
                 const userInfo = `
-                    📋 Datos Ingresados: \n\n
-                    🆔 Cédula ingresada: ${userStates[from].data.cedula}.
+                    📋 Datos Ingresados:
+                    \n\n🆔 Cédula ingresada: ${userStates[from].data.cedula}.
                     \n👤 Nombre ingresado: ${text}.
                     \n\n🔹 Ahora, por favor ingresa tus apellidos.
                 `;
@@ -95,8 +102,8 @@ app.post("/webhook", async (req, res) => {
                 userStates[from].stage = "esperando_celular";
         
                 const userInfo = `
-                    📋 Datos Ingresados: \n\n
-                    🆔 Cédula ingresada: ${userStates[from].data.cedula}
+                    📋 Datos Ingresados:
+                    \n\n🆔 Cédula ingresada: ${userStates[from].data.cedula}
                     \n👤 Nombre ingresado: ${userStates[from].data.nombre}
                     \n🔠 Apellido ingresado: ${text}
                     \n\n🔹 Por ultimo, por favor ingresa tu numero de celular.
@@ -115,7 +122,6 @@ app.post("/webhook", async (req, res) => {
             }
         } else if (userStates[from].stage === "esperando_celular") {
             const ciudades = await obtenerCiudades();
-            console.log(ciudades)
             const opcionesCiudades = ciudades.map(c => `\n${c.id}️⃣ ${c.Ciudad}`).join("");
             console.log(opcionesCiudades)
 
@@ -124,8 +130,8 @@ app.post("/webhook", async (req, res) => {
                 userStates[from].stage = "esperando_ciudad";
         
                 const userInfo = `
-                    📋 Datos Ingresados: \n\n
-                    🆔 Cédula ingresada: ${userStates[from].data.cedula}
+                    📋 Datos Ingresados:
+                    \n\n🆔 Cédula ingresada: ${userStates[from].data.cedula}
                     \n👤 Nombre ingresado: ${userStates[from].data.nombre}
                     \n🔠 Apellido ingresado: ${userStates[from].data.apellido}
                     \n📱 Celular ingresado: ${text}
