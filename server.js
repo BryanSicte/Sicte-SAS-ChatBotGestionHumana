@@ -220,7 +220,7 @@ app.post("/webhook", async (req, res) => {
         } else if (userStates[from].stage === "esperando_detalleCargo") {
 
             const numeroIngresado = parseInt(text, 10);
-            if (numeroIngresado === "1") {
+            if (numeroIngresado === 1) {
 
                 userStates[from].data.detalleCargo = "Si";
                 userStates[from].stage = "esperando_entrevista";
@@ -233,7 +233,7 @@ app.post("/webhook", async (req, res) => {
 
                 await sendMessage(from, userInfo);
 
-            } else if (numeroIngresado === "2") {
+            } else if (numeroIngresado === 2) {
                 userStates[from].data.detalleCargo = "No";
                 await sendMessage(from, "🙏 Gracias por comunicarse con nosotros.");
                 delete userStates[from];
@@ -246,7 +246,7 @@ app.post("/webhook", async (req, res) => {
         } else if (userStates[from].stage === "esperando_entrevista") {
 
             const numeroIngresado = parseInt(text, 10);
-            if (numeroIngresado === "1") {
+            if (numeroIngresado === 1) {
 
                 userStates[from].data.detalleCargo = "Si";
                 userStates[from].stage = "Completado";
@@ -259,7 +259,7 @@ app.post("/webhook", async (req, res) => {
 
                 await sendMessage(from, userInfo);
 
-            } else if (numeroIngresado === "2") {
+            } else if (numeroIngresado === 2) {
                 userStates[from].data.detalleCargo = "No";
                 await sendMessage(from, "🙏 Gracias por comunicarse con nosotros.");
                 delete userStates[from];
@@ -271,7 +271,7 @@ app.post("/webhook", async (req, res) => {
         } else if (userStates[from].stage === "Completado") {
 
             const numeroIngresado = parseInt(text, 10);
-            if (numeroIngresado === "1") {
+            if (numeroIngresado === 1) {
 
                 userStates[from].data.entrevista = "Si";
 
@@ -283,7 +283,7 @@ app.post("/webhook", async (req, res) => {
 
                 await sendMessage(from, userInfo);
 
-            } else if (numeroIngresado === "2") {
+            } else if (numeroIngresado === 2) {
                 userStates[from].data.entrevista = "No";
                 await sendMessage(from, "🙏 Gracias por comunicarse con nosotros.");
                 delete userStates[from];
