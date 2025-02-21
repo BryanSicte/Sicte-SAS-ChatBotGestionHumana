@@ -26,21 +26,55 @@ app.post("/webhook", async (req, res) => {
         restartUserTimer(from);
 
         if (!userStates[from]) {
-            userStates[from] = { stage: "waiting_cedula" };
-
+            userStates[from] = { stage: "waiting_cedula", data: {} };
+        
             await sendMessage(from, "👋 ¡Bienvenido! Por favor, ingresa tu número de cédula para continuar.");
         } else if (userStates[from].stage === "waiting_cedula") {
             
             if (/^\d{6,10}$/.test(text)) {
-                userStates[from].stage = "info_provided";
-
-                const userInfo = `📄 Información de la cédula ${text}: Nombre: Juan Pérez, Estado: Activo.`;
-
+                userStates[from].data.cedula = text;
+                userStates[from].stage = "waiting_nombre";
+        
+                const userInfo = `📄 Cédula ingresada: ${text}\n\n🔹 Ahora por favor, ingresa tu nombre para continuar.`;
+        
                 await sendMessage(from, userInfo);
             } else {
                 await sendMessage(from, "⚠️ La cédula ingresada no es válida. Por favor, ingrésala nuevamente.");
             }
-        }
+        
+        } else if (userStates[from].stage === "waiting_nombre") {
+            
+            if (/^[a-zA-ZÀ-ÿ\s]{3,50}$/.test(text)) {
+                userStates[from].data.nombre = text;
+                userStates[from].stage = "waiting_apellido";
+        
+                const userInfo = `📄 Cédula ingresada: ${userStates[from].data.cedula}.\n🔹 Nombre ingresado: ${text}.\n\n🔹 Ahora, por favor ingresa tus apellidos.`;
+        
+                await sendMessage(from, userInfo);
+            } else {
+                await sendMessage(from, "⚠️ El nombre ingresado no es válido. Asegúrate de escribir solo letras y al menos 3 caracteres.");
+            }
+        
+        } else if (userStates[from].stage === "waiting_apellido") {
+            
+            if (/^[a-zA-ZÀ-ÿ\s]{3,50}$/.test(text)) {
+                userStates[from].data.apellido = text;
+                userStates[from].stage = "completed";
+        
+                const userInfo = `✅ Registro completado:\n📄 Cédula: ${userStates[from].data.cedula}\n🔹 Nombre: ${userStates[from].data.nombre}\n🔹 Apellido: ${text}\n\n💾 Ahora se guardará la información en la base de datos.`;
+        
+                await sendMessage(from, userInfo);
+        
+                // Aquí puedes llamar a una función para guardar en MySQL
+                await saveToDatabase(userStates[from].data);
+                
+                // Limpiar el estado del usuario después de guardar
+                delete userStates[from];
+        
+            } else {
+                await sendMessage(from, "⚠️ El apellido ingresado no es válido. Asegúrate de escribir solo letras y al menos 3 caracteres.");
+            }
+        }        
     }
 
     res.sendStatus(200);
@@ -50,7 +84,7 @@ app.post("/webhook", async (req, res) => {
 async function sendMessage(to, text) {
     try {
         const response = await axios.post(
-            `https://graph.facebook.com/v18.0/${PHONE_NUMBER_ID}/messages`,
+            `https://graph.facebook.com/v21.0/${PHONE_NUMBER_ID}/messages`,
             {
                 messaging_product: "whatsapp",
                 to,
