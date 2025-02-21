@@ -189,7 +189,12 @@ app.post("/webhook", async (req, res) => {
                 const cargoSeleccionado = cargosUnicas[numeroIngresado - 1];
 
                 userStates[from].data.cargo = cargoSeleccionado;
-                userStates[from].stage = "esperando_detalleCargo";
+
+                if (userStates[from].data.cargo === "Ayudante (Sin Moto)") {
+                    userStates[from].stage = "esperando_detalleCargo";
+                } else if (userStates[from].data.cargo === "Conductor" || userStates[from].data.cargo === "Motorizados") {
+                    userStates[from].stage = "esperando_filtro1";
+                }
 
                 let detalleCargo;
 
@@ -200,7 +205,7 @@ app.post("/webhook", async (req, res) => {
                 } else if (cargoSeleccionado === "Ayudante (Sin Moto)") {
                     detalleCargo = "Detalle cargo Ayudante (Sin Moto)"
                 }
-                
+
                 const userInfo = `
                     📋 Datos Ingresados:
                     \n\n💼 Cargo ingresado: ${cargoSeleccionado}
@@ -217,14 +222,115 @@ app.post("/webhook", async (req, res) => {
                 await sendMessage(from, "⚠️ El cargo ingresado no es válido. Por favor, ingresa un número de la lista de cargos.");
             }
 
-        } else if (userStates[from].stage === "esperando_detalleCargo") {
+        } else if (userStates[from].stage === "esperando_filtro1") {
 
             const numeroIngresado = parseInt(text, 10);
             if (numeroIngresado === 1) {
 
                 userStates[from].data.detalleCargo = "Si";
+                userStates[from].stage = "esperando_filtro2";
+
+                let userInfo;
+
+                if (userStates[from].data.cargo === "Motorizados") {
+                    userInfo = `
+                        🔹 ¿Tiene licencia de conduccion A2 y cuenta con moto?, coloca el numero segun tu respuesta:
+                        \n\n➊ Si
+                        \n➋ No
+                    `;
+                } else if (userStates[from].data.cargo === "Conductor") {
+                    userInfo = `
+                        🔹 ¿Que categoria de licencia tiene?, coloca el numero segun tu respuesta:
+                        \n\n➊ C1
+                        \n➋ C2
+                        \n➌ C3
+                    `;
+                }
+
+                await sendMessage(from, userInfo);
+
+            } else if (numeroIngresado === 2) {
+                userStates[from].data.detalleCargo = "No";
+                await sendMessage(from, "🙏 Gracias por comunicarse con nosotros.");
+                delete userStates[from];
+                delete userTimers[from];
+
+            } else {
+                await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice 1 para Si o 2 para No.");
+            }
+
+        } else if (userStates[from].stage === "esperando_filtro2") {
+
+            if (userStates[from].data.cargo === "Motorizados") {
+
+                const numeroIngresado = parseInt(text, 10);
+                if (numeroIngresado === 1) {
+
+                    userStates[from].data.respuestaFiltro1 = "Si";
+                    userStates[from].stage = "esperando_detalleCargo";
+
+                    const userInfo = `
+                        🔹 ¿Tu moto es una scooter o señoritera?, coloca el numero segun tu respuesta:
+                        \n\n➊ No
+                        \n➋ Si
+                    `;
+
+                    await sendMessage(from, userInfo);
+
+                } else if (numeroIngresado === 2) {
+                    userStates[from].data.detalleCargo = "No";
+                    await sendMessage(from, "🙏 Gracias por comunicarse con nosotros.");
+                    delete userStates[from];
+                    delete userTimers[from];
+
+                } else {
+                    await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice 1 para Si o 2 para No.");
+                }
+
+            } else if (userStates[from].data.cargo === "Conductor") {
+
+                const numeroIngresado = parseInt(text, 10);
+                if (numeroIngresado >= 1 && numeroIngresado <= 3) {
+
+                    let respuesta;
+
+                    if (numeroIngresado === 1) {
+                        userStates[from].data.respuestaFiltro1 = "C1";
+                    } else if (numeroIngresado === 2) {
+                        userStates[from].data.respuestaFiltro1 = "C2";
+                    } else if (numeroIngresado === 3) {
+                        userStates[from].data.respuestaFiltro1 = "C3";
+                    }
+
+                    userStates[from].stage = "esperando_detalleCargo";
+
+                    const userInfo = `
+                        🔹 ¿Hace cuanto tiene licencia?, coloca el numero segun tu respuesta:
+                        \n\n➊ 1 año o mas
+                        \n➋ Menos de 1 año
+                    `;
+
+                    await sendMessage(from, userInfo);
+
+                } else {
+                    await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice 1 para C1, 2 para C2 o 3 para C3.");
+                }
+            }
+
+        } else if (userStates[from].stage === "esperando_detalleCargo") {
+
+            const numeroIngresado = parseInt(text, 10);
+            if (numeroIngresado === 1) {
+
+                if (userStates[from].data.cargo === "Motorizados") {
+                    userStates[from].data.respuestaFiltro2 = "No";
+                } else if (userStates[from].data.cargo === "Conductor") {
+                    userStates[from].data.respuestaFiltro2 = "1 año o mas";
+                }
+
+                userStates[from].data.detalleCargo = "Si";
                 userStates[from].stage = "Completado";
-                
+
                 const userInfo = `
                     🔹 Deseas presentarte a una entrevista para mas informacion en (Nombre, direccion y las posibles horas segun la ciudad), coloca el numero segun tu respuesta:
                     \n\n➊ Si
@@ -242,6 +348,7 @@ app.post("/webhook", async (req, res) => {
             } else {
                 await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice 1 para Si o 2 para No.");
             }
+
         } else if (userStates[from].stage === "Completado") {
 
             const numeroIngresado = parseInt(text, 10);
@@ -250,7 +357,7 @@ app.post("/webhook", async (req, res) => {
                 userStates[from].data.entrevista = "Si";
 
                 delete userStates[from];
-                
+
                 const userInfo = `
                     🙏 Gracias por comunicarse con nosotros, te estaremos esperando en nuestras instalaciones.
                 `;
