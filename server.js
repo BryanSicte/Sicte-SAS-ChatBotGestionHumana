@@ -23,9 +23,10 @@ async function obtenerCiudades() {
 
         console.log("✅ Conexión exitosa a MySQL");
         const [rows] = await connection.execute("select * from ciudad_cargos");
+        const ciudadesFiltradas = rows.filter(c => c.estado === "true");
 
         await connection.end();
-        ciudadesCache = rows;
+        ciudadesCache = ciudadesFiltradas;
         return ciudadesCache;
     } catch (error) {
         console.error("❌ Error conectando a MySQL:", error);
@@ -123,10 +124,8 @@ app.post("/webhook", async (req, res) => {
         } else if (userStates[from].stage === "esperando_celular") {
             const ciudades = await obtenerCiudades();
 
-            // 1️⃣ Filtrar duplicados y ordenar alfabéticamente
             const ciudadesUnicas = [...new Set(ciudades.map(c => c.Ciudad))].sort();
 
-            // 2️⃣ Generar la lista numerada automáticamente con iconos de números
             const numerosIconos = ["➊", "➋", "➌", "➍", "➎", "➏", "➐", "➑", "➒", "➓"];
             const opcionesCiudades = ciudadesUnicas
                 .map((ciudad, index) => `\n ${numerosIconos[index] || index + 1} ${ciudad}`)
@@ -158,6 +157,17 @@ app.post("/webhook", async (req, res) => {
             if (numeroIngresado >= 1 && numeroIngresado <= ciudadesUnicas.length) {
                 const ciudadSeleccionada = ciudadesUnicas[numeroIngresado - 1];
 
+                const cargosDisponibles = ciudadesCache
+                    .filter(c => c.Ciudad === ciudadSeleccionada)
+                    .map(c => c.Cargo);
+
+                const cargosUnicos = [...new Set(cargosDisponibles)].sort();
+
+                const numerosIconos = ["➊", "➋", "➌", "➍", "➎", "➏", "➐", "➑", "➒", "➓"];
+                const listaCargos = cargosUnicos
+                    .map((cargo, index) => `\n ${numerosIconos[index] || index + 1} ${cargo}`)
+                    .join("");
+
                 userStates[from].data.ciudad = ciudadSeleccionada;
                 userStates[from].stage = "esperando_cargo";
 
@@ -169,6 +179,7 @@ app.post("/webhook", async (req, res) => {
                     \n📱 Celular ingresado: ${userStates[from].data.celular}
                     \n📍 Ciudad de contacto ingresada: ${ciudadSeleccionada}
                     \n\n🔹 Los cargos ofertados son los siguientes, por favor indica el numero del cual quieres resivir informacion y ser agendado para una entrevista:
+                    ${listaCargos || "\n⚠️ No hay cargos disponibles para esta ciudad."}
                 `;
 
                 await sendMessage(from, userInfo);
