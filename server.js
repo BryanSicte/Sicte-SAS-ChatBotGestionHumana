@@ -9,6 +9,35 @@ const mysql = require("mysql2/promise");
 const TOKEN = process.env.WHATSAPP_TOKEN;
 const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
 
+
+async function probarConexion() {
+    try {
+        const connection = await mysql.createConnection({
+            host: "sicteferias.from-co.net",
+            port: 3309,
+            user: "BryanUtria",
+            password: "Bry@n.98#",
+            database: "gestion_humana"
+        });
+
+        console.log("✅ Conexión exitosa a MySQL");
+        const [rows] = await connection.execute("SELECT NOW() AS fecha_actual");
+        console.log("Resultado de prueba:", rows);
+
+        await connection.end();
+        return "Conexión exitosa: " + JSON.stringify(rows);
+    } catch (error) {
+        console.error("❌ Error conectando a MySQL:", error);
+        return "Error: " + error.message;
+    }
+}
+
+// Nuevo endpoint para probar conexión desde el navegador
+app.get("/test-db", async (req, res) => {
+    const resultado = await probarConexion();
+    res.send(resultado);
+});
+
 // Conexión a MySQL
 const pool = mysql.createPool({
     host: process.env.DB_HOST,
