@@ -9,6 +9,7 @@ const mysql = require("mysql2/promise");
 const TOKEN = process.env.WHATSAPP_TOKEN;
 const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
 
+let ciudadesCache = []
 
 async function obtenerCiudades() {
     try {
@@ -22,7 +23,6 @@ async function obtenerCiudades() {
 
         console.log("✅ Conexión exitosa a MySQL");
         const [rows] = await connection.execute("select * from ciudad_cargos");
-        console.log("Resultado de prueba:", rows);
 
         await connection.end();
         ciudadesCache = rows;
@@ -40,7 +40,7 @@ app.get("/test-db", async (req, res) => {
 });
 
 const userStates = {};
-const userTimers = {};  
+const userTimers = {};
 
 // Webhook para recibir mensajes
 app.post("/webhook", async (req, res) => {
@@ -58,123 +58,124 @@ app.post("/webhook", async (req, res) => {
 
         if (!userStates[from]) {
             userStates[from] = { stage: "esperando_cedula", data: {} };
-        
-            await sendMessage(from, "👋 ¡Bienvenido! Por favor, ingresa tu número de cédula para continuar.");
+
+            await sendMessage(from, "👋 ¡Bienvenido! Por favor, ingresa tu número de cédula para continuar:");
         } else if (userStates[from].stage === "esperando_cedula") {
-            
+
             if (/^\d{6,10}$/.test(text)) {
                 userStates[from].data.cedula = text;
                 userStates[from].stage = "esperando_nombre";
-        
+
                 const userInfo = `
                     📋 Datos Ingresados:
                     \n\n🆔 Cédula ingresada: ${text}
-                    \n\n🔹 Ahora por favor, ingresa tu nombre para continuar.
+                    \n\n🔹 Ahora por favor, ingresa tu nombre para continuar:
                 `;
-        
+
                 await sendMessage(from, userInfo);
             } else {
                 await sendMessage(from, "⚠️ La cédula ingresada no es válida. Por favor, ingrésala nuevamente.");
             }
-        
+
         } else if (userStates[from].stage === "esperando_nombre") {
-            
+
             if (/^[a-zA-ZÀ-ÿ\s]{3,50}$/.test(text)) {
                 userStates[from].data.nombre = text;
                 userStates[from].stage = "esperando_apellido";
-        
+
                 const userInfo = `
                     📋 Datos Ingresados:
                     \n\n🆔 Cédula ingresada: ${userStates[from].data.cedula}.
                     \n👤 Nombre ingresado: ${text}.
-                    \n\n🔹 Ahora, por favor ingresa tus apellidos.
+                    \n\n🔹 Ahora, por favor ingresa tus apellidos:
                 `;
-        
+
                 await sendMessage(from, userInfo);
             } else {
                 await sendMessage(from, "⚠️ El nombre ingresado no es válido. Asegúrate de escribir solo letras y al menos 3 caracteres.");
             }
-        
+
         } else if (userStates[from].stage === "esperando_apellido") {
-            
+
             if (/^[a-zA-ZÀ-ÿ\s]{3,50}$/.test(text)) {
                 userStates[from].data.apellido = text;
                 userStates[from].stage = "esperando_celular";
-        
+
                 const userInfo = `
                     📋 Datos Ingresados:
                     \n\n🆔 Cédula ingresada: ${userStates[from].data.cedula}
                     \n👤 Nombre ingresado: ${userStates[from].data.nombre}
                     \n🔠 Apellido ingresado: ${text}
-                    \n\n🔹 Por ultimo, por favor ingresa tu numero de celular.
+                    \n\n🔹 Por ultimo, por favor ingresa tu numero de celular:
                 `;
-        
+
                 await sendMessage(from, userInfo);
-        
+
                 // // Aquí puedes llamar a una función para guardar en MySQL
                 // await saveToDatabase(userStates[from].data);
-                
+
                 // // Limpiar el estado del usuario después de guardar
                 // delete userStates[from];
-        
+
             } else {
                 await sendMessage(from, "⚠️ El apellido ingresado no es válido. Asegúrate de escribir solo letras y al menos 3 caracteres.");
             }
         } else if (userStates[from].stage === "esperando_celular") {
             const ciudades = await obtenerCiudades();
-            const opcionesCiudades = ciudades.map(c => `\n${c.id}️⃣ ${c.Ciudad}`).join("");
-            console.log(opcionesCiudades)
+
+            // 1️⃣ Filtrar duplicados y ordenar alfabéticamente
+            const ciudadesUnicas = [...new Set(ciudades.map(c => c.Ciudad))].sort();
+
+            // 2️⃣ Generar la lista numerada automáticamente con iconos de números
+            const numerosIconos = ["➊", "➋", "➌", "➍", "➎", "➏", "➐", "➑", "➒", "➓"];
+            const opcionesCiudades = ciudadesUnicas
+                .map((ciudad, index) => `\n ${numerosIconos[index] || index + 1} ${ciudad}`)
+                .join("");
 
             if (/^\d{10}$/.test(text)) {
                 userStates[from].data.celular = text;
                 userStates[from].stage = "esperando_ciudad";
-        
+
                 const userInfo = `
                     📋 Datos Ingresados:
                     \n\n🆔 Cédula ingresada: ${userStates[from].data.cedula}
                     \n👤 Nombre ingresado: ${userStates[from].data.nombre}
                     \n🔠 Apellido ingresado: ${userStates[from].data.apellido}
                     \n📱 Celular ingresado: ${text}
-                    \n\n🔹 Ahora requerimos saber de que ciudad nos contactas para mostrarte los cargos que tenemos ofertados, por favor ingresa el numero de la ciudad de la cual nos contactas.
-                    \n\n ➊ Bogotá  
-                    \n ➋ Zipaquirá y Sabana Norte  
-                    \n ➌ Armenia  
-                    \n ➍ Pereira  
-                    \n ➎ Manizales 
+                    \n\n🔹 Ahora requerimos saber de que ciudad nos contactas para mostrarte los cargos que tenemos ofertados, por favor ingresa el numero de la ciudad de la cual nos contactas:
+                    \n${opcionesCiudades}
                 `;
-        
+
                 await sendMessage(from, userInfo);
             } else {
                 await sendMessage(from, "⚠️ El numero de celular ingresado no es válido. Asegúrate de escribir 10 numeros.");
             }
         } else if (userStates[from].stage === "esperando_ciudad") {
-            
-            if (/^[1-5]$/.test(text)) {
-                let ciudad;
-                if (text === "1") {ciudad = "Bogotá"}
-                else if (text === "2") {ciudad = "Zipaquirá y Sabana Norte"}
-                else if (text === "3") {ciudad = "Armenia"}
-                else if (text === "4") {ciudad = "Pereira"}
-                else if (text === "5") {ciudad = "Manizales"}
 
-                userStates[from].data.ciudad = ciudad;
+            const ciudadesUnicas = [...new Set(ciudadesCache.map(c => c.Ciudad))].sort();
+
+            const numeroIngresado = parseInt(text, 10);
+            if (numeroIngresado >= 1 && numeroIngresado <= ciudadesUnicas.length) {
+                const ciudadSeleccionada = ciudadesUnicas[numeroIngresado - 1];
+
+                userStates[from].data.ciudad = ciudadSeleccionada;
                 userStates[from].stage = "esperando_cargo";
-        
+
                 const userInfo = `
                     📋 Datos Ingresados:
                     \n\n🆔 Cédula ingresada: ${userStates[from].data.cedula}
                     \n👤 Nombre ingresado: ${userStates[from].data.nombre}
                     \n🔠 Apellido ingresado: ${userStates[from].data.apellido}
                     \n📱 Celular ingresado: ${userStates[from].data.celular}
-                    \n📍 Ciudad de contacto ingresada: ${ciudad}
-                    \n\n🔹 Los cargos ofertados son los siguientes, por favor indica el numero del cual quieres resivir informacion y ser agendado para una entrevista.
+                    \n📍 Ciudad de contacto ingresada: ${ciudadSeleccionada}
+                    \n\n🔹 Los cargos ofertados son los siguientes, por favor indica el numero del cual quieres resivir informacion y ser agendado para una entrevista:
                 `;
-        
+
                 await sendMessage(from, userInfo);
             } else {
-                await sendMessage(from, "⚠️ El numero de celular ingresado no es válido. Asegúrate de escribir 10 numeros.");
+                await sendMessage(from, "⚠️ El numero de celular ingresado no es válido. Por favor, ingresa un número de la lista de ciudades.");
             }
-        }  
+        }
     }
 
     res.sendStatus(200);
