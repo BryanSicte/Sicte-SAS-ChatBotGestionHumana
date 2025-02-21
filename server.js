@@ -223,32 +223,6 @@ app.post("/webhook", async (req, res) => {
             if (numeroIngresado === 1) {
 
                 userStates[from].data.detalleCargo = "Si";
-                userStates[from].stage = "esperando_entrevista";
-                
-                const userInfo = `
-                    🔹 Por favor indicanos si quieres continuar con la oferta para el cargo de ${userStates[from].data.cargo}, coloca el numero segun tu respuesta:
-                    \n\n➊ Si
-                    \n➋ No
-                `;
-
-                await sendMessage(from, userInfo);
-
-            } else if (numeroIngresado === 2) {
-                userStates[from].data.detalleCargo = "No";
-                await sendMessage(from, "🙏 Gracias por comunicarse con nosotros.");
-                delete userStates[from];
-                delete userTimers[from];
-
-            } else {
-                await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice 1 para Si o 2 para No.");
-            }
-
-        } else if (userStates[from].stage === "esperando_entrevista") {
-
-            const numeroIngresado = parseInt(text, 10);
-            if (numeroIngresado === 1) {
-
-                userStates[from].data.detalleCargo = "Si";
                 userStates[from].stage = "Completado";
                 
                 const userInfo = `
