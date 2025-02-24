@@ -60,15 +60,15 @@ app.post("/webhook", async (req, res) => {
         if (!userStates[from]) {
             userStates[from] = { stage: "esperando_nombreApellido", data: {} };
 
-            await sendMessage(from, "👋 ¡Bienvenido! Por favor, ingresa su nombre y apellido para continuar:");
+            await sendMessage(from, "👋 ¡Bienvenido! Por favor, ingrese su(s) nombre(s) y apellidos para continuar:");
         } else if (userStates[from].stage === "esperando_nombreApellido") {
 
-            if (/^[a-zA-ZÀ-ÿ\s]{3,50}$/.test(text)) {
+            if (/^[a-zA-ZÀ-ÿ]{1,}[a-zA-ZÀ-ÿ\s]{2,49}$/.test(text)) {
                 userStates[from].data.nombreApellido = text;
                 userStates[from].stage = "esperando_celular";
 
                 const userInfo = `
-                    🔹 ${text} ahora por favor, ingresa tu numero de celular para continuar:
+                    🔹 ${text.split(" ")[0]} ahora por favor, ingresa tu numero de celular para continuar:
                 `;
 
                 await sendMessage(from, userInfo);
