@@ -57,6 +57,29 @@ app.post("/webhook", async (req, res) => {
 
         restartUserTimer(from);
 
+        let hoy = new Date();
+        let diaSemana = hoy.getDay();
+
+        function obtenerDiaHabil(diaActual, diasSumar) {
+            let nuevoDia = new Date(hoy);
+            nuevoDia.setDate(hoy.getDate() + diasSumar);
+
+            if (nuevoDia.getDay() === 0) {
+                nuevoDia.setDate(nuevoDia.getDate() + 1);
+            } else if (nuevoDia.getDay() === 6) {
+                nuevoDia.setDate(nuevoDia.getDate() + 2);
+            }
+
+            return nuevoDia;
+        }
+
+        let diaMañana = obtenerDiaHabil(diaSemana, 1);
+        let diaPasadoMañana = obtenerDiaHabil(diaSemana, 2);
+
+        let opcionesFecha = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        let fechaMañana = diaMañana.toLocaleDateString('es-ES', opcionesFecha);
+        let fechaPasadoMañana = diaPasadoMañana.toLocaleDateString('es-ES', opcionesFecha);
+
         if (!userStates[from]) {
             userStates[from] = { stage: "esperando_nombreApellido", data: {} };
 
@@ -138,6 +161,7 @@ app.post("/webhook", async (req, res) => {
 
                 const userInfo = `
                     🔹 Hola ${nombreFormateado}, te Habla ${personasUnicas}, un gusto saludarte. Los cargos ofertados para la ciudad ${ciudadSeleccionada} son los siguientes, por favor indicame el numero del cargo del cual quieres resivir informacion y ser agendado para una entrevista:
+                    ${listaCargos}
                 `;
 
                 await sendMessage(from, userInfo);
@@ -198,15 +222,18 @@ app.post("/webhook", async (req, res) => {
 
                 let userInfo;
 
+                let nombre = userStates[from].data.nombreApellido.split(" ")[0];
+                let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
+
                 if (userStates[from].data.cargo === "Motorizados") {
                     userInfo = `
-                        🔹 ¿Tiene licencia de conduccion A2 y cuenta con moto?, coloca el numero segun tu respuesta:
+                        🔹 ¿${nombreFormateado} tiene licencia de conduccion A2 y cuenta con moto?, coloca el numero segun tu respuesta:
                         \n\n➊ Si
                         \n➋ No
                     `;
                 } else if (userStates[from].data.cargo === "Conductor") {
                     userInfo = `
-                        🔹 ¿Que categoria de licencia tiene?, coloca el numero segun tu respuesta:
+                        🔹 ¿${nombreFormateado} que categoria de licencia tiene?, coloca el numero segun tu respuesta:
                         \n\n➊ C1
                         \n➋ C2
                         \n➌ C3
@@ -227,6 +254,9 @@ app.post("/webhook", async (req, res) => {
 
         } else if (userStates[from].stage === "esperando_filtro2") {
 
+            let nombre = userStates[from].data.nombreApellido.split(" ")[0];
+            let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
+
             if (userStates[from].data.cargo === "Motorizados") {
 
                 const numeroIngresado = parseInt(text, 10);
@@ -236,7 +266,7 @@ app.post("/webhook", async (req, res) => {
                     userStates[from].stage = "esperando_detalleCargo";
 
                     const userInfo = `
-                        🔹 ¿Tu moto es una scooter o señoritera?, coloca el numero segun tu respuesta:
+                        🔹 ¿${nombreFormateado} tu moto es una scooter o señoritera?, coloca el numero segun tu respuesta:
                         \n\n➊ No
                         \n➋ Si
                     `;
@@ -258,8 +288,6 @@ app.post("/webhook", async (req, res) => {
                 const numeroIngresado = parseInt(text, 10);
                 if (numeroIngresado >= 1 && numeroIngresado <= 3) {
 
-                    let respuesta;
-
                     if (numeroIngresado === 1) {
                         userStates[from].data.respuestaFiltro1 = "C1";
                     } else if (numeroIngresado === 2) {
@@ -271,7 +299,7 @@ app.post("/webhook", async (req, res) => {
                     userStates[from].stage = "esperando_detalleCargo";
 
                     const userInfo = `
-                        🔹 ¿Hace cuanto tiene licencia?, coloca el numero segun tu respuesta:
+                        🔹 ¿${nombreFormateado} hace cuanto tiene licencia?, coloca el numero segun tu respuesta:
                         \n\n➊ 1 año o mas
                         \n➋ Menos de 1 año
                     `;
@@ -285,6 +313,9 @@ app.post("/webhook", async (req, res) => {
 
         } else if (userStates[from].stage === "esperando_detalleCargo") {
 
+            let nombre = userStates[from].data.nombreApellido.split(" ")[0];
+            let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
+
             const numeroIngresado = parseInt(text, 10);
             if (numeroIngresado === 1) {
 
@@ -295,10 +326,10 @@ app.post("/webhook", async (req, res) => {
                 }
 
                 userStates[from].data.detalleCargo = "Si";
-                userStates[from].stage = "Completado";
+                userStates[from].stage = "esperando_entrevista";
 
                 const userInfo = `
-                    🔹 Deseas presentarte a una entrevista para mas informacion en (Nombre, direccion y las posibles horas segun la ciudad), coloca el numero segun tu respuesta:
+                    🔹 ${nombreFormateado} deseas presentarte a una entrevista para mas informacion, coloca el numero segun tu respuesta:
                     \n\n➊ Si
                     \n➋ No
                 `;
@@ -315,17 +346,23 @@ app.post("/webhook", async (req, res) => {
                 await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice 1 para Si o 2 para No.");
             }
 
-        } else if (userStates[from].stage === "Completado") {
+        } else if (userStates[from].stage === "esperando_entrevista") {
+
+            let nombre = userStates[from].data.nombreApellido.split(" ")[0];
+            let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
 
             const numeroIngresado = parseInt(text, 10);
             if (numeroIngresado === 1) {
 
                 userStates[from].data.entrevista = "Si";
-
-                delete userStates[from];
+                userStates[from].stage = "Completado";
 
                 const userInfo = `
-                    🙏 Gracias por comunicarse con nosotros, te estaremos esperando en nuestras instalaciones.
+                    🔹 ${nombreFormateado} por favor indicanos segun la siguiente lista cuando puedes presentarte:
+                    \n\n➊ ${fechaMañana} a las 8:30 am
+                    \n➋ ${fechaMañana} a las 2:00 pm
+                    \n➌ ${fechaPasadoMañana} a las 8:30 am
+                    \n➍ ${fechaPasadoMañana} a las 2:00 pm
                 `;
 
                 await sendMessage(from, userInfo);
@@ -338,6 +375,36 @@ app.post("/webhook", async (req, res) => {
 
             } else {
                 await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice 1 para Si o 2 para No.");
+            }
+
+        } else if (userStates[from].stage === "Completado") {
+
+            let nombre = userStates[from].data.nombreApellido.split(" ")[0];
+            let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
+
+            const numeroIngresado = parseInt(text, 10);
+            if (numeroIngresado >= 1 && numeroIngresado <= 4) {
+
+                if (numeroIngresado === 1) {
+                    userStates[from].data.fechaHora = `${fechaMañana} a las 8:30 am`;
+                } else if (numeroIngresado === 2) {
+                    userStates[from].data.fechaHora = `${fechaMañana} a las 2:00 pm`;
+                } else if (numeroIngresado === 3) {
+                    userStates[from].data.fechaHora = `${fechaPasadoMañana} a las 8:30 am`;
+                } else if (numeroIngresado === 4) {
+                    userStates[from].data.fechaHora = `${fechaPasadoMañana} a las 2:00 pm`;
+                }
+
+                delete userStates[from];
+
+                const userInfo = `
+                    🙏 ${nombreFormateado} Gracias por comunicarse con nosotros, te estaremos esperando en nuestras instalaciones con los isguientes documentos.
+                `;
+
+                await sendMessage(from, userInfo);
+
+            } else {
+                await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice un numero de la lista.");
             }
         }
     }
