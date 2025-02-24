@@ -239,13 +239,13 @@ app.post("/webhook", async (req, res) => {
                 if (userStates[from].data.cargo === "Motorizados") {
                     userInfo = `
                         🔹 ${nombreFormateado}, por favor indícanos si tienes licencia de conducción A2 y si cuentas con moto. Responde colocando el número según tu opción:
-                        \n\n➊ Si
+                        \n➊ Si
                         \n➋ No
                     `;
                 } else if (userStates[from].data.cargo === "Conductor") {
                     userInfo = `
                         🔹 ${nombreFormateado}, por favor indícanos qué categoría de licencia de conducción tienes. Responde colocando el número correspondiente a tu opción:
-                        \n\n➊ C1
+                        \n➊ C1
                         \n➋ C2
                         \n➌ C3
                     `;
@@ -263,7 +263,7 @@ app.post("/webhook", async (req, res) => {
                 userInfo = `
                     🔹 ${nombreFormateado}, ¿te gustaría revisar otros cargos disponibles? 
                     \nPor favor, responde colocando el número correspondiente a tu opción:
-                    \n\n➊ Si
+                    \n➊ Si
                     \n➋ No
                 `;
 
@@ -289,7 +289,7 @@ app.post("/webhook", async (req, res) => {
                     const userInfo = `
                         🔹 ${nombreFormateado}, ¿tu moto es una scooter o una señoritera? 
                         \nPor favor, selecciona la opción correspondiente colocando el número:
-                        \n\n➊ No
+                        \n➊ No
                         \n➋ Si
                     `;
 
@@ -305,7 +305,7 @@ app.post("/webhook", async (req, res) => {
                     userInfo = `
                         🔹 ${nombreFormateado}, ¿te gustaría revisar otros cargos disponibles? 
                         \nPor favor, responde colocando el número correspondiente a tu opción:
-                        \n\n➊ Si
+                        \n➊ Si
                         \n➋ No
                     `;
 
@@ -333,7 +333,7 @@ app.post("/webhook", async (req, res) => {
                     const userInfo = `
                         🔹 ${nombreFormateado}, ¿hace cuánto tiempo tienes licencia de conducción? 
                         \nPor favor, selecciona la opción correspondiente colocando el número:
-                        \n\n➊ 1 año o mas
+                        \n➊ 1 año o mas
                         \n➋ Menos de 1 año
                     `;
 
@@ -364,7 +364,7 @@ app.post("/webhook", async (req, res) => {
                 const userInfo = `
                     🔹 ${nombreFormateado}, ¿deseas presentarte a una entrevista para obtener más información? 
                     \nPor favor, selecciona la opción correspondiente colocando el número:
-                    \n\n➊ Si
+                    \n➊ Si
                     \n➋ No
                 `;
 
@@ -386,7 +386,7 @@ app.post("/webhook", async (req, res) => {
                 userInfo = `
                     🔹 ${nombreFormateado}, ¿te gustaría revisar otros cargos disponibles? 
                     \nPor favor, responde colocando el número correspondiente a tu opción:
-                    \n\n➊ Si
+                    \n➊ Si
                     \n➋ No
                 `;
 
@@ -409,7 +409,7 @@ app.post("/webhook", async (req, res) => {
 
                 const userInfo = `
                     🔹 ${nombreFormateado}, por favor indícanos cuándo puedes presentarte de acuerdo a la siguiente lista. Coloca el número según tu respuesta:
-                    \n\n➊ ${fechaMañana} a las 8:30 am
+                    \n➊ ${fechaMañana} a las 8:30 am
                     \n➋ ${fechaMañana} a las 2:00 pm
                     \n➌ ${fechaPasadoMañana} a las 8:30 am
                     \n➍ ${fechaPasadoMañana} a las 2:00 pm
@@ -427,7 +427,7 @@ app.post("/webhook", async (req, res) => {
                 userInfo = `
                     🔹 ${nombreFormateado}, ¿te gustaría revisar otros cargos disponibles? 
                     \nPor favor, responde colocando el número correspondiente a tu opción:
-                    \n\n➊ Si
+                    \n➊ Si
                     \n➋ No
                 `;
 
