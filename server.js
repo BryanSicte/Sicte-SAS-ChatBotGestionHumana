@@ -212,7 +212,7 @@ app.post("/webhook", async (req, res) => {
                     🔹 ${nombreFormateado}, a continuación te compartimos el detalle de la oferta laboral:
                     \n\n${detalleCargo}
                     \n🔹 Por favor, indícanos si deseas continuar con esta oferta. Responde con el número correspondiente a tu elección:
-                    \n\n➊ Sí, quiero continuar con la oferta.
+                    \n➊ Sí, quiero continuar con la oferta.
                     \n➋ No, gracias, no me interesa.
                     \n\n¡Esperamos tu respuesta para continuar con el proceso de selección!
                 `;
