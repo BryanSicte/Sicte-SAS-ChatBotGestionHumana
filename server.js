@@ -63,12 +63,15 @@ app.post("/webhook", async (req, res) => {
             await sendMessage(from, "👋 ¡Bienvenido! Por favor, ingrese su(s) nombre(s) y apellidos para continuar:");
         } else if (userStates[from].stage === "esperando_nombreApellido") {
 
-            if (/^[a-zA-ZÀ-ÿ]{1,}[a-zA-ZÀ-ÿ\s]{2,49}$/.test(text)) {
+            if (/^[a-zA-ZÀ-ÿ]+(\s[a-zA-ZÀ-ÿ]+){1,49}$/.test(text)) {
                 userStates[from].data.nombreApellido = text;
                 userStates[from].stage = "esperando_celular";
 
+                let nombre = userStates[from].data.nombreApellido.split(" ")[0];
+                let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
+
                 const userInfo = `
-                    🔹 ${text.split(" ")[0]} ahora por favor, ingresa tu numero de celular para continuar:
+                    🔹 ${nombreFormateado} ahora por favor, ingresa tu numero de celular para continuar:
                 `;
 
                 await sendMessage(from, userInfo);
@@ -90,8 +93,11 @@ app.post("/webhook", async (req, res) => {
                 userStates[from].data.celular = text;
                 userStates[from].stage = "esperando_ciudad";
 
+                let nombre = userStates[from].data.nombreApellido.split(" ")[0];
+                let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
+
                 const userInfo = `
-                    🔹 ${text} Ahora requerimos saber de que ciudad nos contactas para mostrarte los cargos que tenemos ofertados, por favor ingresa el numero de la ciudad de la cual nos contactas:
+                    🔹 ${nombreFormateado} ahora requerimos saber de que ciudad nos contactas para mostrarte los cargos que tenemos ofertados, por favor ingresa el numero de la ciudad de la cual nos contactas:
                     \n${opcionesCiudades}
                 `;
 
@@ -118,12 +124,20 @@ app.post("/webhook", async (req, res) => {
                     .map((cargo, index) => `\n ${numerosIconos[index] || index + 1} ${cargo}`)
                     .join("");
 
+                const PersonasDisponibles = ciudadesCache
+                    .filter(c => c.Ciudad === ciudadSeleccionada)
+                    .map(c => c.Nombre);
+
+                const personasUnicas = [...new Set(PersonasDisponibles)].sort();
+
                 userStates[from].data.ciudad = ciudadSeleccionada;
                 userStates[from].stage = "esperando_cargo";
 
+                let nombre = userStates[from].data.nombreApellido.split(" ")[0];
+                let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
+
                 const userInfo = `
-                    🔹 Los cargos ofertados para la ciudad ${ciudadSeleccionada} son los siguientes, por favor indica el numero del cargo del cual quieres resivir informacion y ser agendado para una entrevista:
-                    ${listaCargos || "\n⚠️ No hay cargos disponibles para esta ciudad."}
+                    🔹 Hola ${nombreFormateado}, te Habla ${personasUnicas}, un gusto saludarte. Los cargos ofertados para la ciudad ${ciudadSeleccionada} son los siguientes, por favor indicame el numero del cargo del cual quieres resivir informacion y ser agendado para una entrevista:
                 `;
 
                 await sendMessage(from, userInfo);
@@ -157,10 +171,11 @@ app.post("/webhook", async (req, res) => {
                     detalleCargo = "Detalle cargo Ayudante (Sin Moto)"
                 }
 
+                let nombre = userStates[from].data.nombreApellido.split(" ")[0];
+                let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
+
                 const userInfo = `
-                    📋 Datos Ingresados:
-                    \n\n💼 Cargo ingresado: ${cargoSeleccionado}
-                    \n\n🔹 El detalle de la oferta es la siguiente:
+                    🔹 ${nombreFormateado} el detalle de la oferta es la siguiente:
                     \n\n${detalleCargo}
                     \n\n🔹 Por favor indicanos si quieres continuar con la oferta, coloca el numero segun tu respuesta:
                     \n\n➊ Si
