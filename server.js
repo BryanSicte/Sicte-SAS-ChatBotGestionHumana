@@ -58,13 +58,13 @@ app.post("/webhook", async (req, res) => {
         restartUserTimer(from);
 
         if (!userStates[from]) {
-            userStates[from] = { stage: "esperando_cedula", data: {} };
+            userStates[from] = { stage: "esperando_nombreApellido", data: {} };
 
-            await sendMessage(from, "👋 ¡Bienvenido! Por favor, ingresa tu número de cédula para continuar:");
-        } else if (userStates[from].stage === "esperando_cedula") {
+            await sendMessage(from, "👋 ¡Bienvenido! Por favor, ingresa su nombre y apellido para continuar:");
+        } else if (userStates[from].stage === "esperando_nombreApellido") {
 
             if (/^\d{6,10}$/.test(text)) {
-                userStates[from].data.cedula = text;
+                userStates[from].data.nombreApellido = text;
                 userStates[from].stage = "esperando_nombre";
 
                 const userInfo = `
