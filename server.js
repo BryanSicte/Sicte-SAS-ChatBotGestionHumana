@@ -403,7 +403,7 @@ app.post("/webhook", async (req, res) => {
             } else if (numeroIngresado === 2) {
                 let nombre = userStates[from].data.nombreApellido.split(" ")[0];
                 let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
-                
+
                 userStates[from].stage = "esperando_otroCargo";
                 userStates[from].data.entrevista = "No";
 
@@ -476,7 +476,7 @@ app.post("/webhook", async (req, res) => {
                 let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
 
                 const userInfo2 = `
-                    🔹 Los cargos ofertados para la ciudad ${ciudadSeleccionada} son los siguientes, por favor indicame el numero del cargo del cual quieres resivir informacion y ser agendado para una entrevista:
+                    🔹 ${nombreFormateado} los cargos ofertados para la ciudad ${userStates[from].data.ciudad} son los siguientes, por favor indicame el numero del cargo del cual quieres resivir informacion y ser agendado para una entrevista:
                     ${listaCargos}
                 `;
 
