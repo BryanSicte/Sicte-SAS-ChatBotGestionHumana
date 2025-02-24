@@ -83,7 +83,14 @@ app.post("/webhook", async (req, res) => {
         if (!userStates[from]) {
             userStates[from] = { stage: "esperando_nombreApellido", data: {} };
 
-            await sendMessage(from, "👋 ¡Bienvenido! Por favor, ingrese su(s) nombre(s) y apellidos para continuar:");
+            await sendMessage(from, `
+                👋 ¡Hola! Te damos la bienvenida a Sicte SAS, una empresa líder en telecomunicaciones.            
+                Actualmente, estas en contacto con el área de Gestión Humana en el proceso de selección y contratación.            
+                Para comenzar, por favor ingresa tu(s) nombre(s) y apellidos, para así continuar con el proceso de manera 
+                más personalizada.
+                ¡Estamos muy emocionados de conocerte y poder avanzar juntos!
+            `);
+
         } else if (userStates[from].stage === "esperando_nombreApellido") {
 
             if (/^[a-zA-ZÀ-ÿ]+(\s[a-zA-ZÀ-ÿ]+){1,49}$/.test(text)) {
@@ -94,7 +101,7 @@ app.post("/webhook", async (req, res) => {
                 let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
 
                 const userInfo = `
-                    🔹 ${nombreFormateado} por favor ingresa tu numero de celular para continuar:
+                    🔹 Hola ${nombreFormateado}, para continuar con el proceso, por favor ingresa tu número de celular:
                 `;
 
                 await sendMessage(from, userInfo);
@@ -120,8 +127,11 @@ app.post("/webhook", async (req, res) => {
                 let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
 
                 const userInfo = `
-                    🔹 ${nombreFormateado} requerimos saber de que ciudad nos contactas para mostrarte los cargos que tenemos ofertados, por favor ingresa el numero de la ciudad de la cual nos contactas:
+                    🔹 ${nombreFormateado}, para poder mostrarte los cargos disponibles, necesitamos saber desde 
+                    qué ciudad nos contactas. 
+                    Por favor, ingresa el número correspondiente a la ciudad desde la que te estás comunicando:
                     \n${opcionesCiudades}
+                    \n¡Gracias por tu colaboración, esperamos tu respuesta!
                 `;
 
                 await sendMessage(from, userInfo);
@@ -160,7 +170,11 @@ app.post("/webhook", async (req, res) => {
                 let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
 
                 const userInfo = `
-                    🔹 Hola ${nombreFormateado}, te habla ${personasUnicas}, un gusto saludarte. Los cargos ofertados para la ciudad ${ciudadSeleccionada} son los siguientes, por favor indicame el numero del cargo del cual quieres resivir informacion y ser agendado para una entrevista:
+                    🔹 ¡Hola ${nombreFormateado}! Mi nombre es ${personasUnicas} y es un gusto saludarte.
+                        Te informamos que tenemos varias oportunidades laborales disponibles en la ciudad 
+                        de ${ciudadSeleccionada}. A continuación, te compartimos los cargos ofertados:
+                        Por favor, indícanos el número del cargo que más te interese para recibir más información y 
+                        agendar tu entrevista.
                     ${listaCargos}
                 `;
 
@@ -199,11 +213,12 @@ app.post("/webhook", async (req, res) => {
                 let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
 
                 const userInfo = `
-                    🔹 ${nombreFormateado} el detalle de la oferta es la siguiente:
+                    🔹 Hola ${nombreFormateado}, a continuación te compartimos el detalle de la oferta laboral:
                     \n\n${detalleCargo}
-                    \n\n🔹 Por favor indicanos si quieres continuar con la oferta, coloca el numero segun tu respuesta:
-                    \n\n➊ Si
-                    \n➋ No
+                    🔹 Por favor, indícanos si deseas continuar con esta oferta. Responde con el número correspondiente a tu elección:
+                    \n\n➊ Sí, quiero continuar con la oferta.
+                    \n➋ No, gracias, no me interesa.
+                    \n\n¡Esperamos tu respuesta para continuar con el proceso de selección!
                 `;
 
                 await sendMessage(from, userInfo);
@@ -227,13 +242,13 @@ app.post("/webhook", async (req, res) => {
 
                 if (userStates[from].data.cargo === "Motorizados") {
                     userInfo = `
-                        🔹 ¿${nombreFormateado} tiene licencia de conduccion A2 y cuenta con moto?, coloca el numero segun tu respuesta:
+                        🔹 ${nombreFormateado}, por favor indícanos si tienes licencia de conducción A2 y si cuentas con moto. Responde colocando el número según tu opción:
                         \n\n➊ Si
                         \n➋ No
                     `;
                 } else if (userStates[from].data.cargo === "Conductor") {
                     userInfo = `
-                        🔹 ¿${nombreFormateado} que categoria de licencia tiene?, coloca el numero segun tu respuesta:
+                        🔹 ${nombreFormateado}, por favor indícanos qué categoría de licencia de conducción tienes. Responde colocando el número correspondiente a tu opción:
                         \n\n➊ C1
                         \n➋ C2
                         \n➌ C3
@@ -250,7 +265,7 @@ app.post("/webhook", async (req, res) => {
                 userStates[from].data.detalleCargo = "No";
 
                 userInfo = `
-                    🔹 ¿${nombreFormateado} quieres revisar otros cargos?, coloca el numero segun tu respuesta:
+                    🔹 ${nombreFormateado}, ¿te gustaría revisar otros cargos disponibles? Por favor, responde colocando el número correspondiente a tu opción:
                     \n\n➊ Si
                     \n➋ No
                 `;
@@ -275,7 +290,7 @@ app.post("/webhook", async (req, res) => {
                     userStates[from].stage = "esperando_detalleCargo";
 
                     const userInfo = `
-                        🔹 ¿${nombreFormateado} tu moto es una scooter o señoritera?, coloca el numero segun tu respuesta:
+                        🔹 ${nombreFormateado}, ¿tu moto es una scooter o una señoritera? Por favor, selecciona la opción correspondiente colocando el número:
                         \n\n➊ No
                         \n➋ Si
                     `;
@@ -290,7 +305,7 @@ app.post("/webhook", async (req, res) => {
                     userStates[from].data.detalleCargo = "No";
 
                     userInfo = `
-                        🔹 ¿${nombreFormateado} quieres revisar otros cargos?, coloca el numero segun tu respuesta:
+                        🔹 ${nombreFormateado}, ¿te gustaría revisar otros cargos disponibles? Por favor, responde colocando el número correspondiente a tu opción:
                         \n\n➊ Si
                         \n➋ No
                     `;
@@ -317,7 +332,7 @@ app.post("/webhook", async (req, res) => {
                     userStates[from].stage = "esperando_detalleCargo";
 
                     const userInfo = `
-                        🔹 ¿${nombreFormateado} hace cuanto tiene licencia?, coloca el numero segun tu respuesta:
+                        🔹 ${nombreFormateado}, ¿hace cuánto tiempo tienes licencia de conducción? Por favor, selecciona la opción correspondiente colocando el número:
                         \n\n➊ 1 año o mas
                         \n➋ Menos de 1 año
                     `;
@@ -347,7 +362,7 @@ app.post("/webhook", async (req, res) => {
                 userStates[from].stage = "esperando_entrevista";
 
                 const userInfo = `
-                    🔹 ${nombreFormateado} deseas presentarte a una entrevista para mas informacion, coloca el numero segun tu respuesta:
+                    🔹 ${nombreFormateado}, ¿deseas presentarte a una entrevista para obtener más información? Por favor, selecciona la opción correspondiente colocando el número:
                     \n\n➊ Si
                     \n➋ No
                 `;
@@ -368,7 +383,7 @@ app.post("/webhook", async (req, res) => {
                 }
 
                 userInfo = `
-                    🔹 ¿${nombreFormateado} quieres revisar otros cargos?, coloca el numero segun tu respuesta:
+                    🔹 ${nombreFormateado}, ¿te gustaría revisar otros cargos disponibles? Por favor, responde colocando el número correspondiente a tu opción:
                     \n\n➊ Si
                     \n➋ No
                 `;
@@ -391,7 +406,7 @@ app.post("/webhook", async (req, res) => {
                 userStates[from].stage = "Completado";
 
                 const userInfo = `
-                    🔹 ${nombreFormateado} por favor indicanos segun la siguiente lista cuando puedes presentarte:
+                    🔹 ${nombreFormateado}, por favor indícanos cuándo puedes presentarte de acuerdo a la siguiente lista. Coloca el número según tu respuesta:
                     \n\n➊ ${fechaMañana} a las 8:30 am
                     \n➋ ${fechaMañana} a las 2:00 pm
                     \n➌ ${fechaPasadoMañana} a las 8:30 am
@@ -408,7 +423,7 @@ app.post("/webhook", async (req, res) => {
                 userStates[from].data.entrevista = "No";
 
                 userInfo = `
-                    🔹 ¿${nombreFormateado} quieres revisar otros cargos?, coloca el numero segun tu respuesta:
+                    🔹 ${nombreFormateado}, ¿te gustaría revisar otros cargos disponibles? Por favor, responde colocando el número correspondiente a tu opción:
                     \n\n➊ Si
                     \n➋ No
                 `;
@@ -453,8 +468,11 @@ app.post("/webhook", async (req, res) => {
             const numeroIngresado = parseInt(text, 10);
             if (numeroIngresado === 1) {
 
+                let nombre = userStates[from].data.nombreApellido.split(" ")[0];
+                let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
+
                 const userInfo1 = `
-                    🔹 Vale, te mostrate nuevamente nuevamente la lista de cargos ofertados para la ciudad de ${userStates[from].data.ciudad}.
+                    🔹 ¡Perfecto! Te mostramos nuevamente la lista de cargos ofertados para la ciudad de ${userStates[from].data.ciudad}.
                 `;
 
                 await sendMessage(from, userInfo1);
@@ -472,19 +490,21 @@ app.post("/webhook", async (req, res) => {
 
                 userStates[from].stage = "esperando_cargo";
 
-                let nombre = userStates[from].data.nombreApellido.split(" ")[0];
-                let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
-
                 const userInfo2 = `
-                    🔹 ${nombreFormateado} los cargos ofertados para la ciudad ${userStates[from].data.ciudad} son los siguientes, por favor indicame el numero del cargo del cual quieres resivir informacion y ser agendado para una entrevista:
+                    🔹 ${nombreFormateado}, los cargos ofertados para la ciudad de ${userStates[from].data.ciudad} son los siguientes. 
+                    Por favor, indícame el número del cargo sobre el cual deseas recibir más información y ser agendado para una entrevista:
                     ${listaCargos}
                 `;
 
                 await sendMessage(from, userInfo2);
 
             } else if (numeroIngresado === 2) {
+                let nombre = userStates[from].data.nombreApellido.split(" ")[0];
+                let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
+                
                 userStates[from].data.entrevista = "No";
-                await sendMessage(from, "🙏 Gracias por comunicarse con nosotros.");
+                await sendMessage(from, `🙏 ${nombreFormateado}, gracias por comunicarte con nosotros, en Sicte SAS. Recuerda que puedes 
+                revisar nuestra lista de ofertas en cualquier momento. ¡Estamos aquí para ayudarte!`);
                 delete userStates[from];
                 delete userTimers[from];
 
