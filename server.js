@@ -63,61 +63,19 @@ app.post("/webhook", async (req, res) => {
             await sendMessage(from, "👋 ¡Bienvenido! Por favor, ingresa su nombre y apellido para continuar:");
         } else if (userStates[from].stage === "esperando_nombreApellido") {
 
-            if (/^\d{6,10}$/.test(text)) {
+            if (/^[a-zA-ZÀ-ÿ\s]{3,50}$/.test(text)) {
                 userStates[from].data.nombreApellido = text;
-                userStates[from].stage = "esperando_nombre";
-
-                const userInfo = `
-                    📋 Datos Ingresados:
-                    \n\n🆔 Cédula ingresada: ${text}
-                    \n\n🔹 Ahora por favor, ingresa tu nombre para continuar:
-                `;
-
-                await sendMessage(from, userInfo);
-            } else {
-                await sendMessage(from, "⚠️ La cédula ingresada no es válida. Por favor, ingrésala nuevamente.");
-            }
-
-        } else if (userStates[from].stage === "esperando_nombre") {
-
-            if (/^[a-zA-ZÀ-ÿ\s]{3,50}$/.test(text)) {
-                userStates[from].data.nombre = text;
-                userStates[from].stage = "esperando_apellido";
-
-                const userInfo = `
-                    📋 Datos Ingresados:
-                    \n\n🆔 Cédula ingresada: ${userStates[from].data.cedula}.
-                    \n👤 Nombre ingresado: ${text}.
-                    \n\n🔹 Ahora, por favor ingresa tus apellidos:
-                `;
-
-                await sendMessage(from, userInfo);
-            } else {
-                await sendMessage(from, "⚠️ El nombre ingresado no es válido. Asegúrate de escribir solo letras y al menos 3 caracteres.");
-            }
-
-        } else if (userStates[from].stage === "esperando_apellido") {
-
-            if (/^[a-zA-ZÀ-ÿ\s]{3,50}$/.test(text)) {
-                userStates[from].data.apellido = text;
                 userStates[from].stage = "esperando_celular";
 
                 const userInfo = `
-                    📋 Datos Ingresados:
-                    \n\n🆔 Cédula ingresada: ${userStates[from].data.cedula}
-                    \n👤 Nombre ingresado: ${userStates[from].data.nombre}
-                    \n🔠 Apellidos ingresado: ${text}
-                    \n\n🔹 Por ultimo, por favor ingresa tu numero de celular:
+                    🔹 ${text} ahora por favor, ingresa tu numero de celular para continuar:
                 `;
 
                 await sendMessage(from, userInfo);
-
-                // // Aquí puedes llamar a una función para guardar en MySQL
-                // await saveToDatabase(userStates[from].data);
-
             } else {
-                await sendMessage(from, "⚠️ El apellido ingresado no es válido. Asegúrate de escribir solo letras y al menos 3 caracteres.");
+                await sendMessage(from, "⚠️ El nombre ingresado no es válido. Por favor, ingrésalo nuevamente.");
             }
+
         } else if (userStates[from].stage === "esperando_celular") {
             const ciudades = await obtenerCiudades();
 
@@ -133,12 +91,7 @@ app.post("/webhook", async (req, res) => {
                 userStates[from].stage = "esperando_ciudad";
 
                 const userInfo = `
-                    📋 Datos Ingresados:
-                    \n\n🆔 Cédula ingresada: ${userStates[from].data.cedula}
-                    \n👤 Nombre ingresado: ${userStates[from].data.nombre}
-                    \n🔠 Apellidos ingresado: ${userStates[from].data.apellido}
-                    \n📱 Celular ingresado: ${text}
-                    \n\n🔹 Ahora requerimos saber de que ciudad nos contactas para mostrarte los cargos que tenemos ofertados, por favor ingresa el numero de la ciudad de la cual nos contactas:
+                    🔹 ${text} Ahora requerimos saber de que ciudad nos contactas para mostrarte los cargos que tenemos ofertados, por favor ingresa el numero de la ciudad de la cual nos contactas:
                     \n${opcionesCiudades}
                 `;
 
@@ -169,9 +122,7 @@ app.post("/webhook", async (req, res) => {
                 userStates[from].stage = "esperando_cargo";
 
                 const userInfo = `
-                    📋 Datos Ingresados:
-                    \n\n📍 Ciudad de contacto ingresada: ${ciudadSeleccionada}
-                    \n\n🔹 Los cargos ofertados son los siguientes, por favor indica el numero del cual quieres resivir informacion y ser agendado para una entrevista:
+                    🔹 Los cargos ofertados para la ciudad ${ciudadSeleccionada} son los siguientes, por favor indica el numero del cargo del cual quieres resivir informacion y ser agendado para una entrevista:
                     ${listaCargos || "\n⚠️ No hay cargos disponibles para esta ciudad."}
                 `;
 
