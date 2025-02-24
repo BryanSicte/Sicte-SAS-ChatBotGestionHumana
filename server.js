@@ -243,6 +243,9 @@ app.post("/webhook", async (req, res) => {
                 await sendMessage(from, userInfo);
 
             } else if (numeroIngresado === 2) {
+                let nombre = userStates[from].data.nombreApellido.split(" ")[0];
+                let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
+
                 userStates[from].stage = "esperando_otroCargo";
                 userStates[from].data.detalleCargo = "No";
 
@@ -280,6 +283,9 @@ app.post("/webhook", async (req, res) => {
                     await sendMessage(from, userInfo);
 
                 } else if (numeroIngresado === 2) {
+                    let nombre = userStates[from].data.nombreApellido.split(" ")[0];
+                    let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
+
                     userStates[from].stage = "esperando_otroCargo";
                     userStates[from].data.detalleCargo = "No";
 
@@ -349,6 +355,9 @@ app.post("/webhook", async (req, res) => {
                 await sendMessage(from, userInfo);
 
             } else if (numeroIngresado === 2) {
+                let nombre = userStates[from].data.nombreApellido.split(" ")[0];
+                let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
+
                 userStates[from].stage = "esperando_otroCargo";
                 userStates[from].data.detalleCargo = "No";
 
@@ -392,6 +401,9 @@ app.post("/webhook", async (req, res) => {
                 await sendMessage(from, userInfo);
 
             } else if (numeroIngresado === 2) {
+                let nombre = userStates[from].data.nombreApellido.split(" ")[0];
+                let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
+                
                 userStates[from].stage = "esperando_otroCargo";
                 userStates[from].data.entrevista = "No";
 
