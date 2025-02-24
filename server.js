@@ -94,7 +94,7 @@ app.post("/webhook", async (req, res) => {
                 let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
 
                 const userInfo = `
-                    🔹 ${nombreFormateado} ahora por favor, ingresa tu numero de celular para continuar:
+                    🔹 ${nombreFormateado} por favor ingresa tu numero de celular para continuar:
                 `;
 
                 await sendMessage(from, userInfo);
@@ -120,7 +120,7 @@ app.post("/webhook", async (req, res) => {
                 let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
 
                 const userInfo = `
-                    🔹 ${nombreFormateado} ahora requerimos saber de que ciudad nos contactas para mostrarte los cargos que tenemos ofertados, por favor ingresa el numero de la ciudad de la cual nos contactas:
+                    🔹 ${nombreFormateado} requerimos saber de que ciudad nos contactas para mostrarte los cargos que tenemos ofertados, por favor ingresa el numero de la ciudad de la cual nos contactas:
                     \n${opcionesCiudades}
                 `;
 
@@ -160,7 +160,7 @@ app.post("/webhook", async (req, res) => {
                 let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
 
                 const userInfo = `
-                    🔹 Hola ${nombreFormateado}, te Habla ${personasUnicas}, un gusto saludarte. Los cargos ofertados para la ciudad ${ciudadSeleccionada} son los siguientes, por favor indicame el numero del cargo del cual quieres resivir informacion y ser agendado para una entrevista:
+                    🔹 Hola ${nombreFormateado}, te habla ${personasUnicas}, un gusto saludarte. Los cargos ofertados para la ciudad ${ciudadSeleccionada} son los siguientes, por favor indicame el numero del cargo del cual quieres resivir informacion y ser agendado para una entrevista:
                     ${listaCargos}
                 `;
 
