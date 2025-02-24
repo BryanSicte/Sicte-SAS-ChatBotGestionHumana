@@ -51,7 +51,7 @@ app.post("/webhook", async (req, res) => {
 
     if (message) {
         const from = message.from;
-        const text = message.text?.body || "Mensaje vacío";
+        let text = message.text?.body || "Mensaje vacío";
 
         console.log(`📩 Mensaje recibido de ${from}: ${text}`);
 
@@ -243,10 +243,16 @@ app.post("/webhook", async (req, res) => {
                 await sendMessage(from, userInfo);
 
             } else if (numeroIngresado === 2) {
+                userStates[from].stage = "esperando_otroCargo";
                 userStates[from].data.detalleCargo = "No";
-                await sendMessage(from, "🙏 Gracias por comunicarse con nosotros.");
-                delete userStates[from];
-                delete userTimers[from];
+
+                userInfo = `
+                    🔹 ¿${nombreFormateado} quieres revisar otros cargos?, coloca el numero segun tu respuesta:
+                    \n\n➊ Si
+                    \n➋ No
+                `;
+
+                await sendMessage(from, userInfo);
 
             } else {
                 await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice 1 para Si o 2 para No.");
@@ -274,10 +280,16 @@ app.post("/webhook", async (req, res) => {
                     await sendMessage(from, userInfo);
 
                 } else if (numeroIngresado === 2) {
+                    userStates[from].stage = "esperando_otroCargo";
                     userStates[from].data.detalleCargo = "No";
-                    await sendMessage(from, "🙏 Gracias por comunicarse con nosotros.");
-                    delete userStates[from];
-                    delete userTimers[from];
+
+                    userInfo = `
+                        🔹 ¿${nombreFormateado} quieres revisar otros cargos?, coloca el numero segun tu respuesta:
+                        \n\n➊ Si
+                        \n➋ No
+                    `;
+
+                    await sendMessage(from, userInfo);
 
                 } else {
                     await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice 1 para Si o 2 para No.");
@@ -337,10 +349,22 @@ app.post("/webhook", async (req, res) => {
                 await sendMessage(from, userInfo);
 
             } else if (numeroIngresado === 2) {
+                userStates[from].stage = "esperando_otroCargo";
                 userStates[from].data.detalleCargo = "No";
-                await sendMessage(from, "🙏 Gracias por comunicarse con nosotros.");
-                delete userStates[from];
-                delete userTimers[from];
+
+                if (userStates[from].data.cargo === "Motorizados") {
+                    userStates[from].data.respuestaFiltro2 = "Si";
+                } else if (userStates[from].data.cargo === "Conductor") {
+                    userStates[from].data.respuestaFiltro2 = "Menos de 1 año";
+                }
+
+                userInfo = `
+                    🔹 ¿${nombreFormateado} quieres revisar otros cargos?, coloca el numero segun tu respuesta:
+                    \n\n➊ Si
+                    \n➋ No
+                `;
+
+                await sendMessage(from, userInfo);
 
             } else {
                 await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice 1 para Si o 2 para No.");
@@ -368,10 +392,16 @@ app.post("/webhook", async (req, res) => {
                 await sendMessage(from, userInfo);
 
             } else if (numeroIngresado === 2) {
+                userStates[from].stage = "esperando_otroCargo";
                 userStates[from].data.entrevista = "No";
-                await sendMessage(from, "🙏 Gracias por comunicarse con nosotros.");
-                delete userStates[from];
-                delete userTimers[from];
+
+                userInfo = `
+                    🔹 ¿${nombreFormateado} quieres revisar otros cargos?, coloca el numero segun tu respuesta:
+                    \n\n➊ Si
+                    \n➋ No
+                `;
+
+                await sendMessage(from, userInfo);
 
             } else {
                 await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice 1 para Si o 2 para No.");
@@ -402,6 +432,49 @@ app.post("/webhook", async (req, res) => {
                 `;
 
                 await sendMessage(from, userInfo);
+
+            } else {
+                await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice un numero de la lista.");
+            }
+        } else if (userStates[from].stage === "esperando_otroCargo") {
+
+            const numeroIngresado = parseInt(text, 10);
+            if (numeroIngresado === 1) {
+
+                const userInfo1 = `
+                    🔹 Vale, te mostrate nuevamente nuevamente la lista de cargos ofertados para la ciudad de ${userStates[from].data.ciudad}.
+                `;
+
+                await sendMessage(from, userInfo1);
+
+                const cargosDisponibles = ciudadesCache
+                    .filter(c => c.Ciudad === userStates[from].data.ciudad)
+                    .map(c => c.Cargo);
+
+                const cargosUnicos = [...new Set(cargosDisponibles)].sort();
+
+                const numerosIconos = ["➊", "➋", "➌", "➍", "➎", "➏", "➐", "➑", "➒", "➓"];
+                const listaCargos = cargosUnicos
+                    .map((cargo, index) => `\n ${numerosIconos[index] || index + 1} ${cargo}`)
+                    .join("");
+
+                userStates[from].stage = "esperando_cargo";
+
+                let nombre = userStates[from].data.nombreApellido.split(" ")[0];
+                let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
+
+                const userInfo2 = `
+                    🔹 Los cargos ofertados para la ciudad ${ciudadSeleccionada} son los siguientes, por favor indicame el numero del cargo del cual quieres resivir informacion y ser agendado para una entrevista:
+                    ${listaCargos}
+                `;
+
+                await sendMessage(from, userInfo2);
+
+            } else if (numeroIngresado === 2) {
+                userStates[from].data.entrevista = "No";
+                await sendMessage(from, "🙏 Gracias por comunicarse con nosotros.");
+                delete userStates[from];
+                delete userTimers[from];
 
             } else {
                 await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice un numero de la lista.");
