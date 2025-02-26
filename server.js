@@ -381,10 +381,10 @@ app.post("/webhook", async (req, res) => {
 
                 if (userStates[from].data.cargo === "Motorizados") {
                     userStates[from].data.respuestaFiltro2 = "Si";
-                    mensajeRechazo = "No cumples con uno de los requisito para el cargo el cual es que tu moto no sea una scooter o señoritera."
+                    mensajeRechazo = "No cumples con uno de los requisito para el cargo el cual es que tu moto no sea una scooter o señoritera"
                 } else if (userStates[from].data.cargo === "Conductor") {
                     userStates[from].data.respuestaFiltro2 = "Menos de 1 año";
-                    mensajeRechazo = "No cumples con uno de los requisitos para el cargo: tener al menos 1 año de expedida la licencia de conducción."
+                    mensajeRechazo = "No cumples con uno de los requisitos para el cargo: tener al menos 1 año de expedida la licencia de conducción"
                 }
 
                 userInfo = `
