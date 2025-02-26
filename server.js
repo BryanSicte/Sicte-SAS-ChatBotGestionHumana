@@ -303,7 +303,8 @@ app.post("/webhook", async (req, res) => {
                     userStates[from].data.detalleCargo = "No";
 
                     userInfo = `
-                        🔹 ${nombreFormateado}, ¿te gustaría revisar otros cargos disponibles? 
+                        🔹 No cumples con uno de los requisito para el cargo el cual es tener moto propia y licencia de conduccion A2.
+                        \n${nombreFormateado}, ¿te gustaría revisar otros cargos disponibles? 
                         \nPor favor, responde colocando el número correspondiente a tu opción:
                         \n➊ Si
                         \n➋ No
@@ -373,18 +374,22 @@ app.post("/webhook", async (req, res) => {
             } else if (numeroIngresado === 2) {
                 let nombre = userStates[from].data.nombreApellido.split(" ")[0];
                 let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
+                let mensajeRechazo;
 
                 userStates[from].stage = "esperando_otroCargo";
                 userStates[from].data.detalleCargo = "No";
 
                 if (userStates[from].data.cargo === "Motorizados") {
                     userStates[from].data.respuestaFiltro2 = "Si";
+                    mensajeRechazo = "No cumples con uno de los requisito para el cargo el cual es que tu moto no sea una scooter o señoritera."
                 } else if (userStates[from].data.cargo === "Conductor") {
                     userStates[from].data.respuestaFiltro2 = "Menos de 1 año";
+                    mensajeRechazo = "No cumples con uno de los requisitos para el cargo: tener al menos 1 año de expedida la licencia de conducción."
                 }
 
                 userInfo = `
-                    🔹 ${nombreFormateado}, ¿te gustaría revisar otros cargos disponibles? 
+                    🔹 ${mensajeRechazo}.
+                    \n${nombreFormateado}, ¿te gustaría revisar otros cargos disponibles? 
                     \nPor favor, responde colocando el número correspondiente a tu opción:
                     \n➊ Si
                     \n➋ No
