@@ -165,6 +165,18 @@ app.post("/webhook", async (req, res) => {
             await sendMessage(from, userInfo);
         }
 
+        async function preguntaFiltro3() {
+            userStates[from].stage = "esperando_detalleCargo";
+
+            const userInfo = `
+                🔹 ${nombreFormateado}, ¿Cuánto tiempo de antigüedad tiene tu licencia A2?
+                \nPor favor, selecciona la opción correspondiente colocando el número:
+                \n➊ Menos de 1 año.\n➋ Más de 1 año.\n➌ No tengo licencia A2.
+            `;
+
+            await sendMessage(from, userInfo);
+        }
+
         const from = message.from;
         let text = message.text?.body || "Mensaje vacío";
 
@@ -187,6 +199,8 @@ app.post("/webhook", async (req, res) => {
 
             await sendMessage(from, `
                 👋 ¡Hola! Te damos la bienvenida a Sicte SAS, una empresa líder en telecomunicaciones, te encuentras en contacto con Gestión Humana.
+                \n📜 Protección de Datos: En cumplimiento de la Ley 1581 de 2012 y el Decreto 1377 de 2013, el tratamiento de tus datos personales se realizará conforme a nuestra política de privacidad.
+                \n✅ Si decides continuar, aceptas estos términos.
                 \nPara comenzar, por favor ingresa tu nombre y apellido, para así continuar con el proceso.
                 \n¡Para nosotros es un gusto que nos contactes y poder avanzar juntos!
             `);
@@ -376,14 +390,8 @@ app.post("/webhook", async (req, res) => {
             if (userStates[from].data.cargo === "Motorizados") {
 
                 const numeroIngresado = parseInt(text, 10);
-                if (numeroIngresado >= 1 && numeroIngresado <= 2) {
-
-                    if (numeroIngresado === 1) {
-                        userStates[from].data.respuestaFiltro1 = "Si";
-                    } else if (numeroIngresado === 2) {
-                        userStates[from].data.respuestaFiltro1 = "No";
-                    }
-
+                if (numeroIngresado === 1) {
+                    userStates[from].data.respuestaFiltro1 = "Si";
                     userStates[from].stage = "esperando_filtro3";
 
                     const userInfo = `
@@ -394,6 +402,11 @@ app.post("/webhook", async (req, res) => {
 
                     await sendMessage(from, userInfo);
 
+                } else if (numeroIngresado === 2) {
+                    userStates[from].data.respuestaFiltro1 = "No";
+                    userStates[from].data.respuestaFiltro2 = "No Aplica";
+
+                    preguntaFiltro3();
                 } else {
                     await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice 1 para Si o 2 para No.");
                 }
@@ -437,15 +450,8 @@ app.post("/webhook", async (req, res) => {
                 if (numeroIngresado === 2) {
 
                     userStates[from].data.respuestaFiltro2 = "No";
-                    userStates[from].stage = "esperando_detalleCargo";
-
-                    const userInfo = `
-                        🔹 ${nombreFormateado}, ¿Cuánto tiempo de antigüedad tiene tu licencia A2?
-                        \nPor favor, selecciona la opción correspondiente colocando el número:
-                        \n➊ Menos de 1 año.\n➋ Más de 1 año.\n➌ No tengo licencia A2.
-                    `;
-
-                    await sendMessage(from, userInfo);
+                    
+                    preguntaFiltro3();
 
                 } else if (numeroIngresado === 1) {
                     userStates[from].data.respuestaFiltro2 = "Si";
@@ -514,7 +520,7 @@ app.post("/webhook", async (req, res) => {
                     userStates[from].data.respuestaFiltro2 = "No tengo licencia de conducción categoría C";
 
                     let mensajeRechazo;
-                    mensajeRechazo = "No cumples con uno de los requisito para el cargo el cual es tener licencia A2."
+                    mensajeRechazo = "No cumples con uno de los requisito para el cargo el cual es tener licencia categoria C."
 
                     userInfo = `
                         🔹 ${mensajeRechazo}.
@@ -583,6 +589,7 @@ app.post("/webhook", async (req, res) => {
                 🙏 ${nombreFormateado}, gracias por cofirmar tu asistencia, te espero el día ${userStates[from].data.fechaHora} en la dirección ${userStates[from].data.direccion} de la ciudad ${userStates[from].data.ciudad}.
                 \nPor favor no olvides traer los siguientes documentos:
                 \n1. Hoja de vida actualizada\n2. Fotocopia de la cedula al 150%\n${textoAdicional}
+                \n👋 Gracias por comunicarse con nosotros.
                 `;
 
                 await sendMessage(from, userInfo);
@@ -662,10 +669,10 @@ function restartUserTimer(user) {
         console.log(userInfo);
         await sendMessage(user, userInfo);
 
-        userStates[from].stage = "Tiempo Agotado";
+        userStates[user].stage = "Tiempo Agotado";
         console.log("Datos almacenados en userStates:", userStates[from]);
 
-        await guardarEnBaseDeDatos(userStates[from]); 
+        await guardarEnBaseDeDatos(userStates[user]); 
 
         delete userStates[user];
         delete userTimers[user];
