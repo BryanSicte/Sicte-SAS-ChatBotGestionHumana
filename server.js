@@ -113,8 +113,7 @@ app.post("/webhook", async (req, res) => {
             userInfo = `
                 🔹 ${nombreFormateado}, ¿te gustaría revisar otros cargos disponibles? 
                 \nPor favor, responde colocando el número correspondiente a tu opción:
-                \n➊ Si
-                \n➋ No
+                \n➊ Si\n➋ No
             `;
 
             await sendMessage(from, userInfo);
@@ -275,45 +274,28 @@ app.post("/webhook", async (req, res) => {
 
                 if (cargoSeleccionado === "Motorizados") {
                     detalleCargo = `🔹 ${nombreFormateado}, en este momento buscamos personas con motocicleta para realizar instalaciones de internet, televisión y telefonía en la ciudad ${userStates[from].data.ciudad}.
-                                    \n\n¡NO SE REQUIERE EXPERIENCIA NOSOTROS TE CAPACITAMOS!
-                                    \n\n¿Qué te ofrecemos?
-                                    \n\n- Salario: $1.423.500 + $310.000 rodamiento + $200.000 auxilio de transporte + ¡Excelente! tabla de bonificaciones y todas las prestaciones de ley.
-                                    \n- Contrato a término indefinido.
-                                    \n-	Plan carrera.
-                                    \n-	Capacitación paga.
-                                    \n-	Se realiza curso de alturas una vez se firme contrato laboral.
-                                    \n-	Horario: Lunes a sábado con disponibilidad de laborar 2 domingos.
+                        \n¡NO SE REQUIERE EXPERIENCIA NOSOTROS TE CAPACITAMOS!
+                        \n¿Qué te ofrecemos?
+                        \n- Salario: $1.423.500 + $310.000 rodamiento + $200.000 auxilio de transporte + ¡Excelente! tabla de bonificaciones y todas las prestaciones de ley.\n- Contrato a término indefinido.\n- Plan carrera.\n-	Capacitación paga.\n- Se realiza curso de alturas una vez se firme contrato laboral.\n-	Horario: Lunes a sábado con disponibilidad de laborar 2 domingos.
                     `
                 } else if (cargoSeleccionado === "Conductor") {
                     detalleCargo = `🔹 ${nombreFormateado}, en este momento buscamos conductores con licencia C1 o C2 para realizar instalaciones de internet, televisión y telefonía en la ciudad ${userStates[from].data.ciudad}.
-                                    \n\n¿Qué te ofrecemos?
-                                    \n\n- Salario: $1.423.500 + $500.000 rodamiento + $200.000 auxilio de transporte + ¡Excelente! tabla de bonificaciones y todas las prestaciones de ley.
-                                    \n- Contrato a término indefinido.
-                                    \n-	Plan carrera.
-                                    \n-	Capacitación paga.
-                                    \n-	Se realiza curso de alturas una vez se firme contrato laboral.
-                                    \n-	Horario: Lunes a sábado con disponibilidad de laborar 2 domingos.
+                        \n¿Qué te ofrecemos?
+                        \n- Salario: $1.423.500 + $500.000 rodamiento + $200.000 auxilio de transporte + ¡Excelente! tabla de bonificaciones y todas las prestaciones de ley.\n- Contrato a término indefinido.\n- Plan carrera.\n-	Capacitación paga.\n- Se realiza curso de alturas una vez se firme contrato laboral.\n-	Horario: Lunes a sábado con disponibilidad de laborar 2 domingos.
                     `
                 } else if (cargoSeleccionado === "Ayudante (Sin Moto)") {
                     detalleCargo = `🔹 ${nombreFormateado}, en este momento buscamos bachilleres para realizar instalaciones de internet, televisión y telefonía en la ciudad ${userStates[from].data.ciudad}.
-                                    \n\n¡NO SE REQUIERE EXPERIENCIA NOSOTROS TE CAPACITAMOS!
-                                    \n\n¿Qué te ofrecemos?
-                                    \n\n- Salario: $1.423.500 + $200.000 auxilio de transporte + ¡Excelente! tabla de bonificaciones y todas las prestaciones de ley.
-                                    \n- Contrato a término indefinido.
-                                    \n-	Plan carrera.
-                                    \n-	Capacitación paga.
-                                    \n-	Se realiza curso de alturas una vez se firme contrato laboral.
-                                    \n-	Horario: Lunes a sábado con disponibilidad de laborar 2 domingos.
+                        \n¡NO SE REQUIERE EXPERIENCIA NOSOTROS TE CAPACITAMOS!
+                        \n¿Qué te ofrecemos?
+                        \n- Salario: $1.423.500 + $200.000 auxilio de transporte + ¡Excelente! tabla de bonificaciones y todas las prestaciones de ley.\n- Contrato a término indefinido.\n- Plan carrera.\n- Capacitación paga.\n-	Se realiza curso de alturas una vez se firme contrato laboral.\n- Horario: Lunes a sábado con disponibilidad de laborar 2 domingos.
                     `
                 }
 
                 const userInfo = `
                     ${detalleCargo}
                     \n🔹 Por favor, indícanos si deseas continuar con esta oferta. Responde con el número correspondiente a tu elección:
-                    \n➊ Sí, quiero continuar con la oferta.
-                    \n➋ No, gracias, no me interesa, quiero ver la información de otros cargos disponibles.
-                    \n➌ No, gracias, no me interesa continuar con el proceso.
-                    \n\n¡Esperamos que continues con el proceso de selección!
+                    \n➊ Sí, quiero continuar con la oferta.\n➋ No, gracias, no me interesa, quiero ver la información de otros cargos disponibles.\n➌ No, gracias, no me interesa continuar con el proceso.
+                    \n¡Esperamos que continues con el proceso de selección!
                 `;
 
                 await sendMessage(from, userInfo);
@@ -338,15 +320,12 @@ app.post("/webhook", async (req, res) => {
                 if (userStates[from].data.cargo === "Motorizados") {
                     userInfo = `
                         🔹 ${nombreFormateado}, nos alegra que continues en el proceso, ¿Cuentas con motocicleta propia? 
-                        \n➊ Si
-                        \n➋ No
+                        \n➊ Si\n➋ No
                     `;
                 } else if (userStates[from].data.cargo === "Conductor") {
                     userInfo = `
                         🔹 ${nombreFormateado}, nos alegra que continues en el proceso, ¿Cuentas con experiencia certificada en conducción?
-                        \n➊ Si, menos de 1 año.
-                        \n➋ Si, más de 1 año.
-                        \n➌ No tengo experiencia certificada.
+                        \n➊ Si, menos de 1 año.\n➋ Si, más de 1 año.\n➌ No tengo experiencia certificada.
                     `;
                 }
 
@@ -385,8 +364,7 @@ app.post("/webhook", async (req, res) => {
                     const userInfo = `
                         🔹 ${nombreFormateado}, ¿Tu motocicleta es tipo Scooter?
                         \nPor favor, selecciona la opción correspondiente colocando el número:
-                        \n➊ Si
-                        \n➋ No
+                        \n➊ Si\n➋ No
                     `;
 
                     await sendMessage(from, userInfo);
@@ -413,10 +391,7 @@ app.post("/webhook", async (req, res) => {
                     const userInfo = `
                         🔹 ${nombreFormateado}, ¿Qué tipo de licencia de conducción tienes vigente?
                         \nPor favor, selecciona la opción correspondiente colocando el número:
-                        \n➊ C1
-                        \n➋ C2
-                        \n➌ C3
-                        \n➍ No tengo licencia de conducción categoría C
+                        \n➊ C1\n➋ C2\n➌ C3\n➍ No tengo licencia de conducción categoría C
                     `;
 
                     await sendMessage(from, userInfo);
@@ -442,9 +417,7 @@ app.post("/webhook", async (req, res) => {
                     const userInfo = `
                         🔹 ${nombreFormateado}, ¿Cuánto tiempo de antigüedad tiene tu licencia A2?
                         \nPor favor, selecciona la opción correspondiente colocando el número:
-                        \n➊ Menos de 1 año.
-                        \n➋ Más de 1 año.
-                        \n➌ No tengo licencia A2.
+                        \n➊ Menos de 1 año.\n➋ Más de 1 año.\n➌ No tengo licencia A2.
                     `;
 
                     await sendMessage(from, userInfo);
@@ -586,7 +559,7 @@ app.post("/webhook", async (req, res) => {
                 const userInfo = `
                 🙏 ${nombreFormateado}, gracias por cofirmar tu asistencia, te espero el día ${userStates[from].data.fechaHora} en la dirección ${userStates[from].data.direccion} de la ciudad ${userStates[from].data.ciudad}.
                 \nPor favor no olvides traer los siguientes documentos:
-                \n1. Hoja de vida actualizada\n2. Fotocopia de la cedula al 150%
+                 \n1. Hoja de vida actualizada\n2. Fotocopia de la cedula al 150%
                 ${textoAdicional}
                 `;
 
