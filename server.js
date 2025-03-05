@@ -168,7 +168,7 @@ app.post("/webhook", async (req, res) => {
         async function preguntaFiltro3() {
             let nombre = userStates[from].data.nombreApellido.split(" ")[0];
             let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
-            
+
             userStates[from].stage = "esperando_detalleCargo";
 
             const userInfo = `
@@ -689,11 +689,14 @@ async function guardarEnBaseDeDatos(userData) {
         connection = await pool.getConnection();
 
         const sql = `
-            INSERT INTO registros_chatbot (stage, nombreApellido, celular, ciudad, cargo, detalleCargo, respuestaFiltro1, respuestaFiltro2, respuestaFiltro3, direccion, fechaHora)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO registros_chatbot (registro, stage, nombreApellido, celular, ciudad, cargo, detalleCargo, respuestaFiltro1, respuestaFiltro2, respuestaFiltro3, direccion, fechaHora)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
+        const fechaRegistro = new Date().toISOString().slice(0, 19).replace("T", " "); // Formato "yyyy-mm-dd hh:mm:ss"
+
         const valores = [
+            fechaRegistro,
             userData.stage ?? null,
             userData.data.nombreApellido ?? null,
             userData.data.celular ?? null,
