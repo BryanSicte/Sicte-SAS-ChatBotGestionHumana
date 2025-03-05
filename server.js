@@ -4,12 +4,13 @@ const axios = require("axios");
 const app = express();
 const PORT = 3000;
 app.use(express.json());
-const mysql = require("mysql2/promise");
 
 const TOKEN = process.env.WHATSAPP_TOKEN;
 const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
 
 let ciudadesCache = []
+
+const mysql = require("mysql2/promise");
 
 async function obtenerCiudades() {
     try {
@@ -648,18 +649,16 @@ function restartUserTimer(user) {
     }, 60 * 1000);
 }
 
-const mysql = require('mysql2/promise');
-
-const pool = mysql.createPool({
-    host: 'sicteferias.from-co.net',
-    port: 3309,
-    user: 'BryanUtria',
-    password: 'Bry@n.98#',
-    database: 'gestion_humana'
-});
-
 async function guardarEnBaseDeDatos(userData) {
     try {
+        const connection = await mysql.createConnection({
+            host: process.env.DB_HOST,
+            port: process.env.DB_PORT,
+            user: process.env.DB_USER,
+            password: process.env.DB_PASSWORD,
+            database: process.env.DB_NAME
+        });
+
         const sql = `
             INSERT INTO registros_chatbot (stage, nombreApellido, celular, ciudad, cargo, detalleCargo, respuestaFiltro1, respuestaFiltro2, respuestaFiltro3, direccion, fechaHora)
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -679,9 +678,11 @@ async function guardarEnBaseDeDatos(userData) {
             userData.data.fechaHora
         ];
 
-        const connection = await pool.getConnection();
         await connection.execute(sql, valores);
+        
         connection.release();
+        await connection.end();
+
         console.log("✅ Datos guardados en MySQL");
     } catch (error) {
         console.error("❌ Error guardando en MySQL:", error);
