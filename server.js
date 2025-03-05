@@ -71,7 +71,11 @@ app.post("/webhook", async (req, res) => {
 
             await sendMessage(from, `🙏 ${nombreFormateado}, gracias por comunicarte con nosotros, en Sicte SAS. Recuerda que puedes revisar nuestra lista de ofertas en cualquier momento. ¡Estamos aquí para ayudarte!`);
 
-            //await guardarEnBaseDeDatos(userStates[from]); 
+            if (userStates[from].stage !== 'Completado') {
+                userStates[from].stage = "Salio de la conversacion";
+            }
+
+            await guardarEnBaseDeDatos(userStates[from]); 
 
             delete userStates[from];
             delete userTimers[from];
@@ -298,7 +302,7 @@ app.post("/webhook", async (req, res) => {
 
                 const userInfo = `
                     ${detalleCargo}
-                    🔹 Por favor, indícanos si deseas continuar con esta oferta. Responde con el número correspondiente a tu elección:
+                    \n🔹 Por favor, indícanos si deseas continuar con esta oferta. Responde con el número correspondiente a tu elección:
                     \n➊ Sí, quiero continuar con la oferta.\n➋ No, gracias, no me interesa, quiero ver la información de otros cargos disponibles.\n➌ No, gracias, no me interesa continuar con el proceso.
                     \n¡Esperamos que continues con el proceso de selección!
                 `;
@@ -569,6 +573,8 @@ app.post("/webhook", async (req, res) => {
 
                 console.log("Datos almacenados en userStates:", userStates[from]);
 
+                await guardarEnBaseDeDatos(userStates[from]); 
+
                 delete userStates[from];
 
             } else if (numeroIngresado === 5) {
@@ -633,8 +639,53 @@ function restartUserTimer(user) {
         const userInfo = `🕛 Tiempo de espera agotado para ${user}, Gracias por comunicarse con nosotros.`;
         console.log(userInfo);
         await sendMessage(user, userInfo);
+        userStates[from].stage = "Tiempo Agotado";
+
+        console.log("Datos almacenados en userStates:", userStates[from]);
+        await guardarEnBaseDeDatos(userStates[from]); 
+
         delete userStates[user];
     }, 60 * 1000);
+}
+
+const mysql = require('mysql2/promise');
+
+const pool = mysql.createPool({
+    host: 'sicteferias.from-co.net',
+    port: 3309,
+    user: 'BryanUtria',
+    password: 'Bry@n.98#',
+    database: 'gestion_humana'
+});
+
+async function guardarEnBaseDeDatos(userData) {
+    try {
+        const sql = `
+            INSERT INTO registros_chatbot (stage, nombreApellido, celular, ciudad, cargo, detalleCargo, respuestaFiltro1, respuestaFiltro2, respuestaFiltro3, direccion, fechaHora)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `;
+
+        const valores = [
+            userData.stage,
+            userData.data.nombreApellido,
+            userData.data.celular,
+            userData.data.ciudad,
+            userData.data.cargo,
+            userData.data.detalleCargo,
+            userData.data.respuestaFiltro1,
+            userData.data.respuestaFiltro2,
+            userData.data.respuestaFiltro3,
+            userData.data.direccion.join(', '), // Convertir array a string si hay varias direcciones
+            userData.data.fechaHora
+        ];
+
+        const connection = await pool.getConnection();
+        await connection.execute(sql, valores);
+        connection.release();
+        console.log("✅ Datos guardados en MySQL");
+    } catch (error) {
+        console.error("❌ Error guardando en MySQL:", error);
+    }
 }
 
 // Endpoint para la verificación del webhook
