@@ -673,7 +673,7 @@ function restartUserTimer(user) {
         await sendMessage(user, userInfo);
 
         userStates[user].stage = "Tiempo Agotado";
-        console.log("Datos almacenados en userStates:", userStates[from]);
+        console.log("Datos almacenados en userStates:", userStates[user]);
 
         await guardarEnBaseDeDatos(userStates[user]); 
 
