@@ -166,6 +166,9 @@ app.post("/webhook", async (req, res) => {
         }
 
         async function preguntaFiltro3() {
+            let nombre = userStates[from].data.nombreApellido.split(" ")[0];
+            let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
+            
             userStates[from].stage = "esperando_detalleCargo";
 
             const userInfo = `
