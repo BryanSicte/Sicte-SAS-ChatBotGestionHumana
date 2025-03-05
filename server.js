@@ -135,11 +135,7 @@ app.post("/webhook", async (req, res) => {
 
             const userInfo = `
             🔹 ${nombreFormateado}, el siguiente paso es agendar una entrevista presencial para conocerte mejor y resolver tus inquietudes, por favor indícanos cuando tienes disponibilidad para presentarte en la dirección ${direccion} de la ciudad ${userStates[from].data.ciudad}.
-            \n➊ ${fechaMañana} a las 8:30 am.
-            ➋ ${fechaMañana} a las 2:00 pm.
-            ➌ ${fechaPasadoMañana} a las 8:30 am.
-            ➍ ${fechaPasadoMañana} a las 2:00 pm.
-            ➎ No tengo disponibilidad para asistir.
+            \n➊ ${fechaMañana} a las 8:30 am.\n➋ ${fechaMañana} a las 2:00 pm.\n➌ ${fechaPasadoMañana} a las 8:30 am.\n➍ ${fechaPasadoMañana} a las 2:00 pm.\n➎ No tengo disponibilidad para asistir.
             `;
 
             await sendMessage(from, userInfo);
@@ -590,9 +586,7 @@ app.post("/webhook", async (req, res) => {
                 const userInfo = `
                 🙏 ${nombreFormateado}, gracias por cofirmar tu asistencia, te espero el día ${userStates[from].data.fechaHora} en la dirección ${userStates[from].data.direccion} de la ciudad ${userStates[from].data.ciudad}.
                 \nPor favor no olvides traer los siguientes documentos:
-
-                \n1. Hoja de vida actualizada
-                \n2. Fotocopia de la cedula al 150%
+                \n1. Hoja de vida actualizada\n2. Fotocopia de la cedula al 150%
                 ${textoAdicional}
                 `;
 
