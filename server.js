@@ -120,6 +120,28 @@ app.post("/webhook", async (req, res) => {
             await sendMessage(from, userInfo);
         }
 
+        async function fechasEntrevista() {
+            const direcciones = ciudadesCache
+                .filter(c => c.Ciudad === userStates[from].data.ciudad)
+                .map(c => c.Direccion);
+
+            const direccion = [...new Set(direcciones)].sort();
+
+            userStates[from].stage = "Completado";
+            userStates[from].data.direccion = direccion;
+
+            const userInfo = `
+                🔹 ${nombreFormateado}, el siguiente paso es agendar una entrevista presencial para conocerte mejor y resolver tus inquietudes, por favor indícanos cuando tienes disponibilidad para presentarte en la dirección ${direccion} de la ciudad ${userStates[from].data.ciudad}.
+                \n➊ ${fechaMañana} a las 8:30 am
+                \n➋ ${fechaMañana} a las 2:00 pm
+                \n➌ ${fechaPasadoMañana} a las 8:30 am
+                \n➍ ${fechaPasadoMañana} a las 2:00 pm
+                \n➎ No tengo disponibilidad para asistir
+            `;
+
+            await sendMessage(from, userInfo);
+        }
+
         const from = message.from;
         let text = message.text?.body || "Mensaje vacío";
 
@@ -358,7 +380,7 @@ app.post("/webhook", async (req, res) => {
                     } else if (numeroIngresado === 2) {
                         userStates[from].data.respuestaFiltro1 = "No";
                     }
-                    
+
                     userStates[from].stage = "esperando_filtro3";
 
                     const userInfo = `
@@ -448,9 +470,6 @@ app.post("/webhook", async (req, res) => {
 
         } else if (userStates[from].stage === "esperando_detalleCargo") {
 
-            let nombre = userStates[from].data.nombreApellido.split(" ")[0];
-            let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
-
             const numeroIngresado = parseInt(text, 10);
 
             if (userStates[from].data.cargo === "Motorizados") {
@@ -462,16 +481,7 @@ app.post("/webhook", async (req, res) => {
                         userStates[from].data.respuestaFiltro3 = "Más de 1 año.";
                     }
 
-                    userStates[from].stage = "esperando_entrevista";
-
-                    const userInfo = `
-                        🔹 ${nombreFormateado}, ¿deseas presentarte a una entrevista para obtener más información? 
-                        \nPor favor, selecciona la opción correspondiente colocando el número:
-                        \n➊ Si
-                        \n➋ No
-                    `;
-
-                    await sendMessage(from, userInfo);
+                    fechasEntrevista();
 
                 } else if (numeroIngresado === 3) {
                     userStates[from].data.respuestaFiltro3 = "No tengo licencia A2.";
@@ -491,7 +501,7 @@ app.post("/webhook", async (req, res) => {
                 }
 
             } else if (userStates[from].data.cargo === "Conductor") {
-                
+
                 if (numeroIngresado >= 1 && numeroIngresado <= 3) {
                     if (numeroIngresado === 1) {
                         userStates[from].data.respuestaFiltro2 = "C1";
@@ -501,16 +511,7 @@ app.post("/webhook", async (req, res) => {
                         userStates[from].data.respuestaFiltro2 = "C3";
                     }
 
-                    userStates[from].stage = "esperando_entrevista";
-
-                    const userInfo = `
-                        🔹 ${nombreFormateado}, ¿deseas presentarte a una entrevista para obtener más información? 
-                        \nPor favor, selecciona la opción correspondiente colocando el número:
-                        \n➊ Si
-                        \n➋ No
-                    `;
-
-                    await sendMessage(from, userInfo);
+                    fechasEntrevista();
 
                 } else if (numeroIngresado === 4) {
                     userStates[from].data.respuestaFiltro2 = "No tengo licencia de conducción categoría C";
@@ -536,16 +537,8 @@ app.post("/webhook", async (req, res) => {
                 if (numeroIngresado === 1) {
 
                     userStates[from].data.detalleCargo = "Sí, quiero continuar con la oferta.";
-                    userStates[from].stage = "esperando_entrevista";
-
-                    const userInfo = `
-                        🔹 ${nombreFormateado}, ¿deseas presentarte a una entrevista para obtener más información? 
-                        \nPor favor, selecciona la opción correspondiente colocando el número:
-                        \n➊ Si
-                        \n➋ No
-                    `;
-
-                    await sendMessage(from, userInfo);
+                    
+                    fechasEntrevista();
 
                 } else if (numeroIngresado === 2) {
                     userStates[from].data.detalleCargo = "No, gracias, no me interesa, quiero ver la información de otros cargos disponibles.";
@@ -563,42 +556,13 @@ app.post("/webhook", async (req, res) => {
                 await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice 1 para Si o 2 para No.");
             }
 
-        } else if (userStates[from].stage === "esperando_entrevista") {
-
-            let nombre = userStates[from].data.nombreApellido.split(" ")[0];
-            let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
-
-            const numeroIngresado = parseInt(text, 10);
-            if (numeroIngresado === 1) {
-
-                userStates[from].data.entrevista = "Si";
-                userStates[from].stage = "Completado";
-
-                const userInfo = `
-                    🔹 ${nombreFormateado}, por favor indícanos cuándo puedes presentarte de acuerdo a la siguiente lista. Coloca el número según tu respuesta:
-                    \n➊ ${fechaMañana} a las 8:30 am
-                    \n➋ ${fechaMañana} a las 2:00 pm
-                    \n➌ ${fechaPasadoMañana} a las 8:30 am
-                    \n➍ ${fechaPasadoMañana} a las 2:00 pm
-                `;
-
-                await sendMessage(from, userInfo);
-
-            } else if (numeroIngresado === 2) {
-                userStates[from].data.entrevista = "No";
-                preguntaMirarOtrosCargos();
-
-            } else {
-                await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice 1 para Si o 2 para No.");
-            }
-
         } else if (userStates[from].stage === "Completado") {
 
             let nombre = userStates[from].data.nombreApellido.split(" ")[0];
             let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
 
             const numeroIngresado = parseInt(text, 10);
-            if (numeroIngresado >= 1 && numeroIngresado <= 4) {
+            if (numeroIngresado >= 1 && numeroIngresado <= 5) {
 
                 if (numeroIngresado === 1) {
                     userStates[from].data.fechaHora = `${fechaMañana} a las 8:30 am`;
@@ -608,19 +572,35 @@ app.post("/webhook", async (req, res) => {
                     userStates[from].data.fechaHora = `${fechaPasadoMañana} a las 8:30 am`;
                 } else if (numeroIngresado === 4) {
                     userStates[from].data.fechaHora = `${fechaPasadoMañana} a las 2:00 pm`;
+                } else if (numeroIngresado === 5) {
+                    userStates[from].data.fechaHora = `No tengo disponibilidad para asistir`;
                 }
 
-                delete userStates[from];
+                let textoAdicional;
+
+                if (userStates[from].data.cargo === "Motorizados" || userStates[from].data.cargo === "Conductor") {
+                    textoAdicional = `3. Fotocopia de la licencia de conducción.`
+                } else  {
+                    textoAdicional = ``
+                }
 
                 const userInfo = `
-                    🙏 ${nombreFormateado} Gracias por comunicarse con nosotros, te estaremos esperando en nuestras instalaciones con los isguientes documentos.
+                🙏 ${nombreFormateado}, gracias por cofirmar tu asistencia, te espero el día ${userStates[from].data.fechaHora} en la dirección ${userStates[from].data.direccion} de la ciudad ${userStates[from].data.ciudad}.
+                Por favor no olvides traer los siguientes documentos:
+
+                1.	Hoja de vida actualizada
+                2.	Fotocopia de la cedula al 150%
+                ${textoAdicional}
                 `;
 
                 await sendMessage(from, userInfo);
 
+                delete userStates[from];
+
             } else {
                 await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice un numero de la lista.");
             }
+
         } else if (userStates[from].stage === "esperando_otroCargo") {
 
             const numeroIngresado = parseInt(text, 10);
