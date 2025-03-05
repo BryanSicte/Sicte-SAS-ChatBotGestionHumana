@@ -12,17 +12,24 @@ let ciudadesCache = []
 
 const mysql = require("mysql2/promise");
 
+const pool = mysql.createPool({
+    host: process.env.DB_HOST,
+    port: process.env.DB_PORT,
+    user: process.env.DB_USER,
+    password: process.env.DB_PASSWORD,
+    database: process.env.DB_NAME,
+    waitForConnections: true,
+    connectionLimit: 10,
+    queueLimit: 0
+});
+
 async function obtenerCiudades() {
+    let connection;
     try {
-        const connection = await mysql.createConnection({
-            host: process.env.DB_HOST,
-            port: process.env.DB_PORT,
-            user: process.env.DB_USER,
-            password: process.env.DB_PASSWORD,
-            database: process.env.DB_NAME
-        });
+        connection = await pool.getConnection();
 
         console.log("✅ Conexión exitosa a MySQL");
+
         const [rows] = await connection.execute("select * from ciudad_cargos");
         const ciudadesFiltradas = rows.filter(c => c.estado === "true");
 
@@ -35,7 +42,7 @@ async function obtenerCiudades() {
         return "Error: " + error.message;
 
     } finally {
-        await connection.end();
+        if (connection) connection.release();
     }
 }
 
@@ -666,14 +673,10 @@ function restartUserTimer(user) {
 }
 
 async function guardarEnBaseDeDatos(userData) {
+    let connection;
+
     try {
-        const connection = await mysql.createConnection({
-            host: process.env.DB_HOST,
-            port: process.env.DB_PORT,
-            user: process.env.DB_USER,
-            password: process.env.DB_PASSWORD,
-            database: process.env.DB_NAME
-        });
+        connection = await pool.getConnection();
 
         const sql = `
             INSERT INTO registros_chatbot (stage, nombreApellido, celular, ciudad, cargo, detalleCargo, respuestaFiltro1, respuestaFiltro2, respuestaFiltro3, direccion, fechaHora)
@@ -701,7 +704,7 @@ async function guardarEnBaseDeDatos(userData) {
         console.error("❌ Error guardando en MySQL:", error);
 
     }  finally {
-        await connection.end(); // Cerrar la conexión
+        if (connection) connection.release(); // Cerrar la conexión
     }
 }
 
