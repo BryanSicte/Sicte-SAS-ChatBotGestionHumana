@@ -26,12 +26,16 @@ async function obtenerCiudades() {
         const [rows] = await connection.execute("select * from ciudad_cargos");
         const ciudadesFiltradas = rows.filter(c => c.estado === "true");
 
-        await connection.end();
+        
         ciudadesCache = ciudadesFiltradas;
         return ciudadesCache;
+
     } catch (error) {
         console.error("❌ Error conectando a MySQL:", error);
         return "Error: " + error.message;
+
+    } finally {
+        await connection.end();
     }
 }
 
@@ -691,13 +695,13 @@ async function guardarEnBaseDeDatos(userData) {
         ];
 
         await connection.execute(sql, valores);
-
-        connection.release();
-        await connection.end();
-
         console.log("✅ Datos guardados en MySQL");
+
     } catch (error) {
         console.error("❌ Error guardando en MySQL:", error);
+
+    }  finally {
+        await connection.end(); // Cerrar la conexión
     }
 }
 
