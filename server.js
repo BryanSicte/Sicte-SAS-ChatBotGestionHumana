@@ -50,16 +50,6 @@ app.post("/webhook", async (req, res) => {
     const message = req.body.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
 
     if (message) {
-        const from = message.from;
-        let text = message.text?.body || "Mensaje vacío";
-
-        console.log(`📩 Mensaje recibido de ${from}: ${text}`);
-
-        restartUserTimer(from);
-
-        let hoy = new Date();
-        let diaSemana = hoy.getDay();
-
         function obtenerDiaHabil(diaActual, diasSumar) {
             let nuevoDia = new Date(hoy);
             nuevoDia.setDate(hoy.getDate() + diasSumar);
@@ -73,6 +63,73 @@ app.post("/webhook", async (req, res) => {
             return nuevoDia;
         }
 
+        async function salirDeLaConversacion() {
+            let nombre = userStates[from].data.nombreApellido.split(" ")[0];
+            let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
+
+            await sendMessage(from, `🙏 ${nombreFormateado}, gracias por comunicarte con nosotros, en Sicte SAS. Recuerda que puedes revisar nuestra lista de ofertas en cualquier momento. ¡Estamos aquí para ayudarte!`);
+            delete userStates[from];
+            delete userTimers[from];
+        }
+
+        async function mirarOtrosCargos() {
+            let nombre = userStates[from].data.nombreApellido.split(" ")[0];
+            let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
+
+            const userInfo1 = `
+                🔹 ¡Perfecto! Te mostramos nuevamente la lista de cargos ofertados para la ciudad de ${userStates[from].data.ciudad}.
+            `;
+
+            await sendMessage(from, userInfo1);
+
+            const cargosDisponibles = ciudadesCache
+                .filter(c => c.Ciudad === userStates[from].data.ciudad)
+                .map(c => c.Cargo);
+
+            const cargosUnicos = [...new Set(cargosDisponibles)].sort();
+
+            const numerosIconos = ["➊", "➋", "➌", "➍", "➎", "➏", "➐", "➑", "➒", "➓"];
+            const listaCargos = cargosUnicos
+                .map((cargo, index) => `\n ${numerosIconos[index] || index + 1} ${cargo}`)
+                .join("");
+
+            userStates[from].stage = "esperando_cargo";
+
+            const userInfo2 = `
+                🔹 ${nombreFormateado}, los cargos ofertados para la ciudad de ${userStates[from].data.ciudad} son los siguientes.
+                \nPor favor, indícanos el número del cargo que más te interese para recibir más información.
+                ${listaCargos}
+            `;
+
+            await sendMessage(from, userInfo2);
+        }
+
+        async function preguntaMirarOtrosCargos() {
+            let nombre = userStates[from].data.nombreApellido.split(" ")[0];
+            let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
+
+            userStates[from].stage = "esperando_otroCargo";
+
+            userInfo = `
+                🔹 ${nombreFormateado}, ¿te gustaría revisar otros cargos disponibles? 
+                \nPor favor, responde colocando el número correspondiente a tu opción:
+                \n➊ Si
+                \n➋ No
+            `;
+
+            await sendMessage(from, userInfo);
+        }
+
+        const from = message.from;
+        let text = message.text?.body || "Mensaje vacío";
+
+        console.log(`📩 Mensaje recibido de ${from}: ${text}`);
+
+        restartUserTimer(from);
+
+        let hoy = new Date();
+        let diaSemana = hoy.getDay();
+
         let diaMañana = obtenerDiaHabil(diaSemana, 1);
         let diaPasadoMañana = obtenerDiaHabil(diaSemana, 2);
 
@@ -84,10 +141,9 @@ app.post("/webhook", async (req, res) => {
             userStates[from] = { stage: "esperando_nombreApellido", data: {} };
 
             await sendMessage(from, `
-                👋 ¡Hola! Te damos la bienvenida a Sicte SAS, una empresa líder en telecomunicaciones.
-                \nActualmente, estas en contacto con el área de Gestión Humana en el proceso de selección y contratación.
-                \nPara comenzar, por favor ingresa tu(s) nombre(s) y apellidos, para así continuar con el proceso de manera más personalizada.
-                \n¡Estamos muy emocionados de conocerte y poder avanzar juntos!
+                👋 ¡Hola! Te damos la bienvenida a Sicte SAS, una empresa líder en telecomunicaciones, te encuentras en contacto con Gestión Humana.
+                \nPara comenzar, por favor ingresa tu nombre y apellido, para así continuar con el proceso.
+                \n¡Para nosotros es un gusto que nos contactes y poder avanzar juntos!
             `);
 
         } else if (userStates[from].stage === "esperando_nombreApellido") {
@@ -126,10 +182,8 @@ app.post("/webhook", async (req, res) => {
                 let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
 
                 const userInfo = `
-                    🔹 ${nombreFormateado}, para poder mostrarte los cargos disponibles, necesitamos saber desde qué ciudad nos contactas.
-                    \nPor favor, ingresa el número correspondiente a la ciudad desde la que te estás comunicando:
+                    🔹 ${nombreFormateado}, nos gustaría conocer desde qué ciudad nos contactas. Por favor ingresa el número correspondiente.
                     ${opcionesCiudades}
-                    \n¡Gracias por tu colaboración, esperamos tu respuesta!
                 `;
 
                 await sendMessage(from, userInfo);
@@ -168,9 +222,8 @@ app.post("/webhook", async (req, res) => {
                 let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
 
                 const userInfo = `
-                    🔹 ¡Hola ${nombreFormateado}! Mi nombre es ${personasUnicas} y es un gusto saludarte.
-                        \nTe informamos que tenemos varias oportunidades laborales disponibles en la ciudad de ${ciudadSeleccionada}. A continuación, te compartimos los cargos ofertados:
-                        \nPor favor, indícanos el número del cargo que más te interese para recibir más información y agendar tu entrevista.
+                    🔹 ¡Hola ${nombreFormateado}! Mi nombre es ${personasUnicas} es un gusto saludarte. A continuación, te compartimos los cargos disponibles:
+                    \nPor favor, indícanos el número del cargo que más te interese para recibir más información.
                     ${listaCargos}
                 `;
 
@@ -195,26 +248,51 @@ app.post("/webhook", async (req, res) => {
                     userStates[from].stage = "esperando_filtro1";
                 }
 
+                let nombre = userStates[from].data.nombreApellido.split(" ")[0];
+                let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
                 let detalleCargo;
 
                 if (cargoSeleccionado === "Motorizados") {
-                    detalleCargo = "Detalle cargo Motorizados"
+                    detalleCargo = `🔹 ${nombreFormateado}, en este momento buscamos personas con motocicleta para realizar instalaciones de internet, televisión y telefonía en la ciudad ${userStates[from].data.ciudad}.
+                                    \n\n¡NO SE REQUIERE EXPERIENCIA NOSOTROS TE CAPACITAMOS!
+                                    \n\n¿Qué te ofrecemos?
+                                    \n\n- Salario: $1.423.500 + $310.000 rodamiento + $200.000 auxilio de transporte + ¡Excelente! tabla de bonificaciones y todas las prestaciones de ley.
+                                    \n- Contrato a término indefinido.
+                                    \n-	Plan carrera.
+                                    \n-	Capacitación paga.
+                                    \n-	Se realiza curso de alturas una vez se firme contrato laboral.
+                                    \n-	Horario: Lunes a sábado con disponibilidad de laborar 2 domingos.
+                    `
                 } else if (cargoSeleccionado === "Conductor") {
-                    detalleCargo = "Detalle cargo Conductor"
+                    detalleCargo = `🔹 ${nombreFormateado}, en este momento buscamos conductores con licencia C1 o C2 para realizar instalaciones de internet, televisión y telefonía en la ciudad ${userStates[from].data.ciudad}.
+                                    \n\n¿Qué te ofrecemos?
+                                    \n\n- Salario: $1.423.500 + $500.000 rodamiento + $200.000 auxilio de transporte + ¡Excelente! tabla de bonificaciones y todas las prestaciones de ley.
+                                    \n- Contrato a término indefinido.
+                                    \n-	Plan carrera.
+                                    \n-	Capacitación paga.
+                                    \n-	Se realiza curso de alturas una vez se firme contrato laboral.
+                                    \n-	Horario: Lunes a sábado con disponibilidad de laborar 2 domingos.
+                    `
                 } else if (cargoSeleccionado === "Ayudante (Sin Moto)") {
-                    detalleCargo = "Detalle cargo Ayudante (Sin Moto)"
+                    detalleCargo = `🔹 ${nombreFormateado}, en este momento buscamos bachilleres para realizar instalaciones de internet, televisión y telefonía en la ciudad ${userStates[from].data.ciudad}.
+                                    \n\n¡NO SE REQUIERE EXPERIENCIA NOSOTROS TE CAPACITAMOS!
+                                    \n\n¿Qué te ofrecemos?
+                                    \n\n- Salario: $1.423.500 + $200.000 auxilio de transporte + ¡Excelente! tabla de bonificaciones y todas las prestaciones de ley.
+                                    \n- Contrato a término indefinido.
+                                    \n-	Plan carrera.
+                                    \n-	Capacitación paga.
+                                    \n-	Se realiza curso de alturas una vez se firme contrato laboral.
+                                    \n-	Horario: Lunes a sábado con disponibilidad de laborar 2 domingos.
+                    `
                 }
 
-                let nombre = userStates[from].data.nombreApellido.split(" ")[0];
-                let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
-
                 const userInfo = `
-                    🔹 ${nombreFormateado}, a continuación te compartimos el detalle de la oferta laboral:
-                    \n\n${detalleCargo}
+                    ${detalleCargo}
                     \n🔹 Por favor, indícanos si deseas continuar con esta oferta. Responde con el número correspondiente a tu elección:
                     \n➊ Sí, quiero continuar con la oferta.
-                    \n➋ No, gracias, no me interesa.
-                    \n\n¡Esperamos tu respuesta para continuar con el proceso de selección!
+                    \n➋ No, gracias, no me interesa, quiero ver la información de otros cargos disponibles.
+                    \n➌ No, gracias, no me interesa continuar con el proceso.
+                    \n\n¡Esperamos que continues con el proceso de selección!
                 `;
 
                 await sendMessage(from, userInfo);
@@ -228,7 +306,7 @@ app.post("/webhook", async (req, res) => {
             const numeroIngresado = parseInt(text, 10);
             if (numeroIngresado === 1) {
 
-                userStates[from].data.detalleCargo = "Si";
+                userStates[from].data.detalleCargo = "Sí, quiero continuar con la oferta.";
                 userStates[from].stage = "esperando_filtro2";
 
                 let userInfo;
@@ -238,39 +316,31 @@ app.post("/webhook", async (req, res) => {
 
                 if (userStates[from].data.cargo === "Motorizados") {
                     userInfo = `
-                        🔹 ${nombreFormateado}, por favor indícanos si tienes licencia de conducción A2 y si cuentas con moto. Responde colocando el número según tu opción:
+                        🔹 ${nombreFormateado}, nos alegra que continues en el proceso, ¿Cuentas con motocicleta propia? 
                         \n➊ Si
                         \n➋ No
                     `;
                 } else if (userStates[from].data.cargo === "Conductor") {
                     userInfo = `
-                        🔹 ${nombreFormateado}, por favor indícanos qué categoría de licencia de conducción tienes. Responde colocando el número correspondiente a tu opción:
-                        \n➊ C1
-                        \n➋ C2
-                        \n➌ C3
+                        🔹 ${nombreFormateado}, nos alegra que continues en el proceso, ¿Cuentas con experiencia certificada en conducción?
+                        \n➊ Si, menos de 1 año.
+                        \n➋ Si, más de 1 año.
+                        \n➌ No tengo experiencia certificada.
                     `;
                 }
 
                 await sendMessage(from, userInfo);
 
             } else if (numeroIngresado === 2) {
-                let nombre = userStates[from].data.nombreApellido.split(" ")[0];
-                let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
+                userStates[from].data.detalleCargo = "No, gracias, no me interesa, quiero ver la información de otros cargos disponibles.";
+                mirarOtrosCargos();
 
-                userStates[from].stage = "esperando_otroCargo";
-                userStates[from].data.detalleCargo = "No";
-
-                userInfo = `
-                    🔹 ${nombreFormateado}, ¿te gustaría revisar otros cargos disponibles? 
-                    \nPor favor, responde colocando el número correspondiente a tu opción:
-                    \n➊ Si
-                    \n➋ No
-                `;
-
-                await sendMessage(from, userInfo);
+            } else if (numeroIngresado === 3) {
+                userStates[from].data.detalleCargo = "No, gracias, no me interesa continuar con el proceso.";
+                salirDeLaConversacion();
 
             } else {
-                await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice 1 para Si o 2 para No.");
+                await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice un numero de 1 a 3.");
             }
 
         } else if (userStates[from].stage === "esperando_filtro2") {
@@ -281,31 +351,19 @@ app.post("/webhook", async (req, res) => {
             if (userStates[from].data.cargo === "Motorizados") {
 
                 const numeroIngresado = parseInt(text, 10);
-                if (numeroIngresado === 1) {
+                if (numeroIngresado >= 1 && numeroIngresado <= 2) {
 
-                    userStates[from].data.respuestaFiltro1 = "Si";
-                    userStates[from].stage = "esperando_detalleCargo";
+                    if (numeroIngresado === 1) {
+                        userStates[from].data.respuestaFiltro1 = "Si";
+                    } else if (numeroIngresado === 2) {
+                        userStates[from].data.respuestaFiltro1 = "No";
+                    }
+                    
+                    userStates[from].stage = "esperando_filtro3";
 
                     const userInfo = `
-                        🔹 ${nombreFormateado}, ¿tu moto es una scooter o una señoritera? 
+                        🔹 ${nombreFormateado}, ¿Tu motocicleta es tipo Scooter?
                         \nPor favor, selecciona la opción correspondiente colocando el número:
-                        \n➊ No
-                        \n➋ Si
-                    `;
-
-                    await sendMessage(from, userInfo);
-
-                } else if (numeroIngresado === 2) {
-                    let nombre = userStates[from].data.nombreApellido.split(" ")[0];
-                    let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
-
-                    userStates[from].stage = "esperando_otroCargo";
-                    userStates[from].data.detalleCargo = "No";
-
-                    userInfo = `
-                        🔹 No cumples con uno de los requisito para el cargo el cual es tener moto propia y licencia de conduccion A2.
-                        \n${nombreFormateado}, ¿te gustaría revisar otros cargos disponibles? 
-                        \nPor favor, responde colocando el número correspondiente a tu opción:
                         \n➊ Si
                         \n➋ No
                     `;
@@ -322,26 +380,69 @@ app.post("/webhook", async (req, res) => {
                 if (numeroIngresado >= 1 && numeroIngresado <= 3) {
 
                     if (numeroIngresado === 1) {
-                        userStates[from].data.respuestaFiltro1 = "C1";
+                        userStates[from].data.respuestaFiltro1 = "Si, menos de 1 año.";
                     } else if (numeroIngresado === 2) {
-                        userStates[from].data.respuestaFiltro1 = "C2";
+                        userStates[from].data.respuestaFiltro1 = "Si, más de 1 año.";
                     } else if (numeroIngresado === 3) {
-                        userStates[from].data.respuestaFiltro1 = "C3";
+                        userStates[from].data.respuestaFiltro1 = "No tengo experiencia certificada.";
                     }
 
                     userStates[from].stage = "esperando_detalleCargo";
 
                     const userInfo = `
-                        🔹 ${nombreFormateado}, ¿hace cuánto tiempo tienes licencia de conducción? 
+                        🔹 ${nombreFormateado}, ¿Qué tipo de licencia de conducción tienes vigente?
                         \nPor favor, selecciona la opción correspondiente colocando el número:
-                        \n➊ 1 año o mas
-                        \n➋ Menos de 1 año
+                        \n➊ C1
+                        \n➋ C2
+                        \n➌ C3
+                        \n➍ No tengo licencia de conducción categoría C
                     `;
 
                     await sendMessage(from, userInfo);
 
                 } else {
-                    await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice 1 para C1, 2 para C2 o 3 para C3.");
+                    await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indique un numero entre 1 y 4.");
+                }
+            }
+
+        } else if (userStates[from].stage === "esperando_filtro3") {
+
+            let nombre = userStates[from].data.nombreApellido.split(" ")[0];
+            let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
+
+            if (userStates[from].data.cargo === "Motorizados") {
+
+                const numeroIngresado = parseInt(text, 10);
+                if (numeroIngresado === 2) {
+
+                    userStates[from].data.respuestaFiltro2 = "No";
+                    userStates[from].stage = "esperando_detalleCargo";
+
+                    const userInfo = `
+                        🔹 ${nombreFormateado}, ¿Cuánto tiempo de antigüedad tiene tu licencia A2?
+                        \nPor favor, selecciona la opción correspondiente colocando el número:
+                        \n➊ Menos de 1 año.
+                        \n➋ Más de 1 año.
+                        \n➌ No tengo licencia A2.
+                    `;
+
+                    await sendMessage(from, userInfo);
+
+                } else if (numeroIngresado === 1) {
+                    userStates[from].data.respuestaFiltro2 = "Si";
+
+                    let mensajeRechazo;
+                    mensajeRechazo = "No cumples con uno de los requisito para el cargo el cual es que tu moto no sea una scooter o señoritera"
+
+                    userInfo = `
+                        🔹 ${mensajeRechazo}.
+                    `;
+
+                    await sendMessage(from, userInfo);
+
+                    preguntaMirarOtrosCargos();
+                } else {
+                    await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice 1 para Si o 2 para No.");
                 }
             }
 
@@ -351,51 +452,112 @@ app.post("/webhook", async (req, res) => {
             let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
 
             const numeroIngresado = parseInt(text, 10);
-            if (numeroIngresado === 1) {
 
-                if (userStates[from].data.cargo === "Motorizados") {
-                    userStates[from].data.respuestaFiltro2 = "No";
-                } else if (userStates[from].data.cargo === "Conductor") {
-                    userStates[from].data.respuestaFiltro2 = "1 año o mas";
+            if (userStates[from].data.cargo === "Motorizados") {
+
+                if (numeroIngresado >= 1 && numeroIngresado <= 2) {
+                    if (numeroIngresado === 1) {
+                        userStates[from].data.respuestaFiltro3 = "Menos de 1 año.";
+                    } else if (numeroIngresado === 2) {
+                        userStates[from].data.respuestaFiltro3 = "Más de 1 año.";
+                    }
+
+                    userStates[from].stage = "esperando_entrevista";
+
+                    const userInfo = `
+                        🔹 ${nombreFormateado}, ¿deseas presentarte a una entrevista para obtener más información? 
+                        \nPor favor, selecciona la opción correspondiente colocando el número:
+                        \n➊ Si
+                        \n➋ No
+                    `;
+
+                    await sendMessage(from, userInfo);
+
+                } else if (numeroIngresado === 3) {
+                    userStates[from].data.respuestaFiltro3 = "No tengo licencia A2.";
+
+                    let mensajeRechazo;
+                    mensajeRechazo = "No cumples con uno de los requisito para el cargo el cual es tener licencia A2."
+
+                    userInfo = `
+                        🔹 ${mensajeRechazo}.
+                    `;
+
+                    await sendMessage(from, userInfo);
+
+                    preguntaMirarOtrosCargos();
+                } else {
+                    await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice un numero de 1 a 3.");
                 }
 
-                userStates[from].data.detalleCargo = "Si";
-                userStates[from].stage = "esperando_entrevista";
+            } else if (userStates[from].data.cargo === "Conductor") {
+                
+                if (numeroIngresado >= 1 && numeroIngresado <= 3) {
+                    if (numeroIngresado === 1) {
+                        userStates[from].data.respuestaFiltro2 = "C1";
+                    } else if (numeroIngresado === 2) {
+                        userStates[from].data.respuestaFiltro2 = "C2";
+                    } else if (numeroIngresado === 3) {
+                        userStates[from].data.respuestaFiltro2 = "C3";
+                    }
 
-                const userInfo = `
-                    🔹 ${nombreFormateado}, ¿deseas presentarte a una entrevista para obtener más información? 
-                    \nPor favor, selecciona la opción correspondiente colocando el número:
-                    \n➊ Si
-                    \n➋ No
-                `;
+                    userStates[from].stage = "esperando_entrevista";
 
-                await sendMessage(from, userInfo);
+                    const userInfo = `
+                        🔹 ${nombreFormateado}, ¿deseas presentarte a una entrevista para obtener más información? 
+                        \nPor favor, selecciona la opción correspondiente colocando el número:
+                        \n➊ Si
+                        \n➋ No
+                    `;
 
-            } else if (numeroIngresado === 2) {
-                let nombre = userStates[from].data.nombreApellido.split(" ")[0];
-                let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
-                let mensajeRechazo;
+                    await sendMessage(from, userInfo);
 
-                userStates[from].stage = "esperando_otroCargo";
-                userStates[from].data.detalleCargo = "No";
+                } else if (numeroIngresado === 4) {
+                    userStates[from].data.respuestaFiltro2 = "No tengo licencia de conducción categoría C";
 
-                if (userStates[from].data.cargo === "Motorizados") {
-                    userStates[from].data.respuestaFiltro2 = "Si";
-                    mensajeRechazo = "No cumples con uno de los requisito para el cargo el cual es que tu moto no sea una scooter o señoritera"
-                } else if (userStates[from].data.cargo === "Conductor") {
-                    userStates[from].data.respuestaFiltro2 = "Menos de 1 año";
-                    mensajeRechazo = "No cumples con uno de los requisitos para el cargo: tener al menos 1 año de expedida la licencia de conducción"
+                    let mensajeRechazo;
+                    mensajeRechazo = "No cumples con uno de los requisito para el cargo el cual es tener licencia A2."
+
+                    userInfo = `
+                        🔹 ${mensajeRechazo}.
+                    `;
+
+                    await sendMessage(from, userInfo);
+
+                    preguntaMirarOtrosCargos();
+
+                } else {
+                    await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice un numero de 1 a 4.");
                 }
 
-                userInfo = `
-                    🔹 ${mensajeRechazo}.
-                    \n${nombreFormateado}, ¿te gustaría revisar otros cargos disponibles? 
-                    \nPor favor, responde colocando el número correspondiente a tu opción:
-                    \n➊ Si
-                    \n➋ No
-                `;
+            } else if (userStates[from].data.cargo === "Ayudante (Sin Moto)") {
 
-                await sendMessage(from, userInfo);
+                const numeroIngresado = parseInt(text, 10);
+                if (numeroIngresado === 1) {
+
+                    userStates[from].data.detalleCargo = "Sí, quiero continuar con la oferta.";
+                    userStates[from].stage = "esperando_entrevista";
+
+                    const userInfo = `
+                        🔹 ${nombreFormateado}, ¿deseas presentarte a una entrevista para obtener más información? 
+                        \nPor favor, selecciona la opción correspondiente colocando el número:
+                        \n➊ Si
+                        \n➋ No
+                    `;
+
+                    await sendMessage(from, userInfo);
+
+                } else if (numeroIngresado === 2) {
+                    userStates[from].data.detalleCargo = "No, gracias, no me interesa, quiero ver la información de otros cargos disponibles.";
+                    mirarOtrosCargos();
+
+                } else if (numeroIngresado === 3) {
+                    userStates[from].data.detalleCargo = "No, gracias, no me interesa continuar con el proceso.";
+                    salirDeLaConversacion();
+
+                } else {
+                    await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice un numero de 1 a 3.");
+                }
 
             } else {
                 await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice 1 para Si o 2 para No.");
@@ -423,20 +585,8 @@ app.post("/webhook", async (req, res) => {
                 await sendMessage(from, userInfo);
 
             } else if (numeroIngresado === 2) {
-                let nombre = userStates[from].data.nombreApellido.split(" ")[0];
-                let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
-
-                userStates[from].stage = "esperando_otroCargo";
                 userStates[from].data.entrevista = "No";
-
-                userInfo = `
-                    🔹 ${nombreFormateado}, ¿te gustaría revisar otros cargos disponibles? 
-                    \nPor favor, responde colocando el número correspondiente a tu opción:
-                    \n➊ Si
-                    \n➋ No
-                `;
-
-                await sendMessage(from, userInfo);
+                preguntaMirarOtrosCargos();
 
             } else {
                 await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice 1 para Si o 2 para No.");
@@ -475,45 +625,11 @@ app.post("/webhook", async (req, res) => {
 
             const numeroIngresado = parseInt(text, 10);
             if (numeroIngresado === 1) {
-
-                let nombre = userStates[from].data.nombreApellido.split(" ")[0];
-                let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
-
-                const userInfo1 = `
-                    🔹 ¡Perfecto! Te mostramos nuevamente la lista de cargos ofertados para la ciudad de ${userStates[from].data.ciudad}.
-                `;
-
-                await sendMessage(from, userInfo1);
-
-                const cargosDisponibles = ciudadesCache
-                    .filter(c => c.Ciudad === userStates[from].data.ciudad)
-                    .map(c => c.Cargo);
-
-                const cargosUnicos = [...new Set(cargosDisponibles)].sort();
-
-                const numerosIconos = ["➊", "➋", "➌", "➍", "➎", "➏", "➐", "➑", "➒", "➓"];
-                const listaCargos = cargosUnicos
-                    .map((cargo, index) => `\n ${numerosIconos[index] || index + 1} ${cargo}`)
-                    .join("");
-
-                userStates[from].stage = "esperando_cargo";
-
-                const userInfo2 = `
-                    🔹 ${nombreFormateado}, los cargos ofertados para la ciudad de ${userStates[from].data.ciudad} son los siguientes.
-                    \nPor favor, indícame el número del cargo sobre el cual deseas recibir más información y ser agendado para una entrevista:
-                    ${listaCargos}
-                `;
-
-                await sendMessage(from, userInfo2);
+                mirarOtrosCargos();
 
             } else if (numeroIngresado === 2) {
-                let nombre = userStates[from].data.nombreApellido.split(" ")[0];
-                let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
-
                 userStates[from].data.entrevista = "No";
-                await sendMessage(from, `🙏 ${nombreFormateado}, gracias por comunicarte con nosotros, en Sicte SAS. Recuerda que puedes revisar nuestra lista de ofertas en cualquier momento. ¡Estamos aquí para ayudarte!`);
-                delete userStates[from];
-                delete userTimers[from];
+                salirDeLaConversacion();
 
             } else {
                 await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice un numero de la lista.");
