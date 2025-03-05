@@ -121,6 +121,9 @@ app.post("/webhook", async (req, res) => {
         }
 
         async function fechasEntrevista() {
+            let nombre = userStates[from].data.nombreApellido.split(" ")[0];
+            let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
+            
             const direcciones = ciudadesCache
                 .filter(c => c.Ciudad === userStates[from].data.ciudad)
                 .map(c => c.Direccion);
