@@ -64,10 +64,15 @@ app.post("/webhook", async (req, res) => {
         }
 
         async function salirDeLaConversacion() {
+            console.log("Datos almacenados en userStates:", userStates[from]);
+
             let nombre = userStates[from].data.nombreApellido.split(" ")[0];
             let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
 
             await sendMessage(from, `🙏 ${nombreFormateado}, gracias por comunicarte con nosotros, en Sicte SAS. Recuerda que puedes revisar nuestra lista de ofertas en cualquier momento. ¡Estamos aquí para ayudarte!`);
+
+            //await guardarEnBaseDeDatos(userStates[from]); 
+
             delete userStates[from];
             delete userTimers[from];
         }
@@ -293,7 +298,7 @@ app.post("/webhook", async (req, res) => {
 
                 const userInfo = `
                     ${detalleCargo}
-                    \n🔹 Por favor, indícanos si deseas continuar con esta oferta. Responde con el número correspondiente a tu elección:
+                    🔹 Por favor, indícanos si deseas continuar con esta oferta. Responde con el número correspondiente a tu elección:
                     \n➊ Sí, quiero continuar con la oferta.\n➋ No, gracias, no me interesa, quiero ver la información de otros cargos disponibles.\n➌ No, gracias, no me interesa continuar con el proceso.
                     \n¡Esperamos que continues con el proceso de selección!
                 `;
@@ -561,6 +566,8 @@ app.post("/webhook", async (req, res) => {
                 `;
 
                 await sendMessage(from, userInfo);
+
+                console.log("Datos almacenados en userStates:", userStates[from]);
 
                 delete userStates[from];
 
