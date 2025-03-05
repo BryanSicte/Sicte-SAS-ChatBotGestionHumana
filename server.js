@@ -276,18 +276,18 @@ app.post("/webhook", async (req, res) => {
                     detalleCargo = `🔹 ${nombreFormateado}, en este momento buscamos personas con motocicleta para realizar instalaciones de internet, televisión y telefonía en la ciudad ${userStates[from].data.ciudad}.
                         \n¡NO SE REQUIERE EXPERIENCIA NOSOTROS TE CAPACITAMOS!
                         \n¿Qué te ofrecemos?
-                        \n- Salario: $1.423.500 + $310.000 rodamiento + $200.000 auxilio de transporte + ¡Excelente! tabla de bonificaciones y todas las prestaciones de ley.\n- Contrato a término indefinido.\n- Plan carrera.\n-	Capacitación paga.\n- Se realiza curso de alturas una vez se firme contrato laboral.\n-	Horario: Lunes a sábado con disponibilidad de laborar 2 domingos.
+                        \n• Salario: $1.423.500 + $310.000 rodamiento + $200.000 auxilio de transporte + ¡Excelente! tabla de bonificaciones y todas las prestaciones de ley.\n• Contrato a término indefinido.\n• Plan carrera.\n•	Capacitación paga.\n• Se realiza curso de alturas una vez se firme contrato laboral.\n•	Horario: Lunes a sábado con disponibilidad de laborar 2 domingos.
                     `
                 } else if (cargoSeleccionado === "Conductor") {
                     detalleCargo = `🔹 ${nombreFormateado}, en este momento buscamos conductores con licencia C1 o C2 para realizar instalaciones de internet, televisión y telefonía en la ciudad ${userStates[from].data.ciudad}.
                         \n¿Qué te ofrecemos?
-                        \n- Salario: $1.423.500 + $500.000 rodamiento + $200.000 auxilio de transporte + ¡Excelente! tabla de bonificaciones y todas las prestaciones de ley.\n- Contrato a término indefinido.\n- Plan carrera.\n-	Capacitación paga.\n- Se realiza curso de alturas una vez se firme contrato laboral.\n-	Horario: Lunes a sábado con disponibilidad de laborar 2 domingos.
+                        \n• Salario: $1.423.500 + $500.000 rodamiento + $200.000 auxilio de transporte + ¡Excelente! tabla de bonificaciones y todas las prestaciones de ley.\n• Contrato a término indefinido.\n• Plan carrera.\n•	Capacitación paga.\n• Se realiza curso de alturas una vez se firme contrato laboral.\n•	Horario: Lunes a sábado con disponibilidad de laborar 2 domingos.
                     `
                 } else if (cargoSeleccionado === "Ayudante (Sin Moto)") {
                     detalleCargo = `🔹 ${nombreFormateado}, en este momento buscamos bachilleres para realizar instalaciones de internet, televisión y telefonía en la ciudad ${userStates[from].data.ciudad}.
                         \n¡NO SE REQUIERE EXPERIENCIA NOSOTROS TE CAPACITAMOS!
                         \n¿Qué te ofrecemos?
-                        \n- Salario: $1.423.500 + $200.000 auxilio de transporte + ¡Excelente! tabla de bonificaciones y todas las prestaciones de ley.\n- Contrato a término indefinido.\n- Plan carrera.\n- Capacitación paga.\n-	Se realiza curso de alturas una vez se firme contrato laboral.\n- Horario: Lunes a sábado con disponibilidad de laborar 2 domingos.
+                        \n• Salario: $1.423.500 + $200.000 auxilio de transporte + ¡Excelente! tabla de bonificaciones y todas las prestaciones de ley.\n• Contrato a término indefinido.\n• Plan carrera.\n• Capacitación paga.\n•	Se realiza curso de alturas una vez se firme contrato laboral.\n• Horario: Lunes a sábado con disponibilidad de laborar 2 domingos.
                     `
                 }
 
@@ -534,7 +534,7 @@ app.post("/webhook", async (req, res) => {
             let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
 
             const numeroIngresado = parseInt(text, 10);
-            if (numeroIngresado >= 1 && numeroIngresado <= 5) {
+            if (numeroIngresado >= 1 && numeroIngresado <= 4) {
 
                 if (numeroIngresado === 1) {
                     userStates[from].data.fechaHora = `${fechaMañana} a las 8:30 am`;
@@ -544,8 +544,6 @@ app.post("/webhook", async (req, res) => {
                     userStates[from].data.fechaHora = `${fechaPasadoMañana} a las 8:30 am`;
                 } else if (numeroIngresado === 4) {
                     userStates[from].data.fechaHora = `${fechaPasadoMañana} a las 2:00 pm`;
-                } else if (numeroIngresado === 5) {
-                    userStates[from].data.fechaHora = `No tengo disponibilidad para asistir`;
                 }
 
                 let textoAdicional;
@@ -559,14 +557,18 @@ app.post("/webhook", async (req, res) => {
                 const userInfo = `
                 🙏 ${nombreFormateado}, gracias por cofirmar tu asistencia, te espero el día ${userStates[from].data.fechaHora} en la dirección ${userStates[from].data.direccion} de la ciudad ${userStates[from].data.ciudad}.
                 \nPor favor no olvides traer los siguientes documentos:
-                 \n1. Hoja de vida actualizada\n2. Fotocopia de la cedula al 150%
-                ${textoAdicional}
+                \n1. Hoja de vida actualizada\n2. Fotocopia de la cedula al 150%\n${textoAdicional}
                 `;
 
                 await sendMessage(from, userInfo);
 
                 delete userStates[from];
 
+            } else if (numeroIngresado === 5) {
+                userStates[from].data.fechaHora = `No tengo disponibilidad para asistir`;
+
+                salirDeLaConversacion();
+                
             } else {
                 await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice un numero de la lista.");
             }
