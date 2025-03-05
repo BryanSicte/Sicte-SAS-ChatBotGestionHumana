@@ -78,8 +78,12 @@ app.post("/webhook", async (req, res) => {
 
             await guardarEnBaseDeDatos(userStates[from]); 
 
+            if (userTimers[from]) {
+                clearTimeout(userTimers[from]);
+                delete userTimers[from];
+            }
+
             delete userStates[from];
-            delete userTimers[from];
         }
 
         async function mirarOtrosCargos() {
@@ -636,16 +640,24 @@ function restartUserTimer(user) {
         clearTimeout(userTimers[user]);
     }
 
+    if (!userStates[user] || userStates[user].stage === "Salio de la conversacion" || userStates[user].stage === "Completado") {
+        return;
+    }
+
     userTimers[user] = setTimeout(async () => {
+        if (!userStates[user]) return;
+        
         const userInfo = `🕛 Tiempo de espera agotado para ${user}, Gracias por comunicarse con nosotros.`;
         console.log(userInfo);
         await sendMessage(user, userInfo);
-        userStates[from].stage = "Tiempo Agotado";
 
+        userStates[from].stage = "Tiempo Agotado";
         console.log("Datos almacenados en userStates:", userStates[from]);
+
         await guardarEnBaseDeDatos(userStates[from]); 
 
         delete userStates[user];
+        delete userTimers[user];
     }, 60 * 1000);
 }
 
@@ -665,21 +677,21 @@ async function guardarEnBaseDeDatos(userData) {
         `;
 
         const valores = [
-            userData.stage,
-            userData.data.nombreApellido,
-            userData.data.celular,
-            userData.data.ciudad,
-            userData.data.cargo,
-            userData.data.detalleCargo,
-            userData.data.respuestaFiltro1,
-            userData.data.respuestaFiltro2,
-            userData.data.respuestaFiltro3,
-            userData.data.direccion.join(', '), // Convertir array a string si hay varias direcciones
-            userData.data.fechaHora
+            userData.stage ?? null,
+            userData.data.nombreApellido ?? null,
+            userData.data.celular ?? null,
+            userData.data.ciudad ?? null,
+            userData.data.cargo ?? null,
+            userData.data.detalleCargo ?? null,
+            userData.data.respuestaFiltro1 ?? null,
+            userData.data.respuestaFiltro2 ?? null,
+            userData.data.respuestaFiltro3 ?? null,
+            (userData.data.direccion?.join(', ') ?? null), // Asegura que dirección sea un string
+            userData.data.fechaHora ?? null
         ];
 
         await connection.execute(sql, valores);
-        
+
         connection.release();
         await connection.end();
 
