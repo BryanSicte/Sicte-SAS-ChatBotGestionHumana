@@ -693,7 +693,16 @@ async function guardarEnBaseDeDatos(userData) {
             VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
-        const fechaRegistro = new Date().toISOString().slice(0, 19).replace("T", " "); // Formato "yyyy-mm-dd hh:mm:ss"
+        const fechaRegistro = new Date().toLocaleString("es-CO", {
+            timeZone: "America/Bogota",
+            year: "numeric",
+            month: "2-digit",
+            day: "2-digit",
+            hour: "2-digit",
+            minute: "2-digit",
+            second: "2-digit",
+            hour12: false
+        }).replace(/\//g, "-").replace(",", ""); // Formato "yyyy-mm-dd hh:mm:ss"
 
         const valores = [
             fechaRegistro,
