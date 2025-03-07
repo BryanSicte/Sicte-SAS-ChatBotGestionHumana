@@ -63,10 +63,8 @@ app.post("/webhook", async (req, res) => {
             let nuevoDia = new Date(hoy);
             nuevoDia.setDate(hoy.getDate() + diasSumar);
 
-            if (nuevoDia.getDay() === 0) {
+            while (nuevoDia.getDay() === 0 || nuevoDia.getDay() === 6) {
                 nuevoDia.setDate(nuevoDia.getDate() + 1);
-            } else if (nuevoDia.getDay() === 6) {
-                nuevoDia.setDate(nuevoDia.getDate() + 2);
             }
 
             return nuevoDia;
@@ -188,7 +186,7 @@ app.post("/webhook", async (req, res) => {
         let diaSemana = hoy.getDay();
 
         let diaMañana = obtenerDiaHabil(diaSemana, 1);
-        let diaPasadoMañana = obtenerDiaHabil(diaSemana, 2);
+        let diaPasadoMañana = obtenerDiaHabil(diaMañana, 1);
 
         console.log(diaMañana)
         console.log(diaPasadoMañana)
