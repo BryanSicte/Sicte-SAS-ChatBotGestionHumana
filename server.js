@@ -10,18 +10,15 @@ const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
 
 let ciudadesCache = []
 
-const mysql = require("mysql2/promise");
+const pool = require('./db');
 
-const pool = mysql.createPool({
-    host: process.env.DB_HOST,
-    port: process.env.DB_PORT,
-    user: process.env.DB_USER,
-    password: process.env.DB_PASSWORD,
-    database: process.env.DB_NAME,
-    waitForConnections: true,
-    connectionLimit: 10,
-    queueLimit: 0
-});
+setInterval(async () => {
+    try {
+        const [rows] = await pool.query("SELECT 1"); // Mantiene activas las conexiones
+    } catch (error) {
+        console.error("❌ Error en keep-alive:", error);
+    }
+}, 30000); // Ejecuta cada 30 segundos
 
 async function obtenerCiudades() {
     let connection;
@@ -42,7 +39,7 @@ async function obtenerCiudades() {
         return "Error: " + error.message;
 
     } finally {
-        pool.releaseConnection(connection);
+        if (connection) connection.release();
     }
 }
 
