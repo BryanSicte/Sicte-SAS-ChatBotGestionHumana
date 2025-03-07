@@ -689,13 +689,15 @@ async function guardarEnBaseDeDatos(userData) {
         connection = await pool.getConnection();
 
         const sql = `
-            INSERT INTO registros_chatbot (registro, stage, nombreApellido, celular, ciudad, cargo, detalleCargo, respuestaFiltro1, respuestaFiltro2, respuestaFiltro3, direccion, fechaHora)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO registros_chatbot (registro, stage, nombreApellido, celular, ciudad, cargo, detalleCargo, respuestaFiltro1, respuestaFiltro2, respuestaFiltro3, direccion, fechaHora, estadoFinal)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
         const fechaRegistro = new Date().toLocaleString("en-CA", {
             timeZone: "America/Bogota"
         }).replace("T", " ");
+
+        const estadoFinal = "Pendiente"
 
         const valores = [
             fechaRegistro,
@@ -709,7 +711,8 @@ async function guardarEnBaseDeDatos(userData) {
             userData.data.respuestaFiltro2 ?? null,
             userData.data.respuestaFiltro3 ?? null,
             (userData.data.direccion?.join(', ') ?? null), // Asegura que dirección sea un string
-            userData.data.fechaHora ?? null
+            userData.data.fechaHora ?? null,
+            estadoFinal
         ];
 
         await connection.execute(sql, valores);
