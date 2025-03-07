@@ -59,7 +59,7 @@ app.post("/webhook", async (req, res) => {
     const message = req.body.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
 
     if (message) {
-        function obtenerDiaHabil(diaActual, diasSumar) {
+        function obtenerDiaHabil(hoy, diasSumar) {
             let nuevoDia = new Date(hoy);
             nuevoDia.setDate(hoy.getDate() + diasSumar);
 
@@ -183,9 +183,7 @@ app.post("/webhook", async (req, res) => {
         restartUserTimer(from);
 
         let hoy = new Date();
-        let diaSemana = hoy.getDay();
-
-        let diaMañana = obtenerDiaHabil(diaSemana, 1);
+        let diaMañana = obtenerDiaHabil(hoy, 1);
         let diaPasadoMañana = obtenerDiaHabil(diaMañana, 1);
 
         console.log(diaMañana)
