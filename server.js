@@ -42,7 +42,7 @@ async function obtenerCiudades() {
         return "Error: " + error.message;
 
     } finally {
-        if (connection) connection.release();
+        pool.releaseConnection(connection);
     }
 }
 
