@@ -186,15 +186,9 @@ app.post("/webhook", async (req, res) => {
         let diaMañana = obtenerDiaHabil(hoy, 1);
         let diaPasadoMañana = obtenerDiaHabil(diaMañana, 1);
 
-        console.log(diaMañana)
-        console.log(diaPasadoMañana)
-
         let opcionesFecha = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         let fechaMañana = diaMañana.toLocaleDateString('es-ES', opcionesFecha);
         let fechaPasadoMañana = diaPasadoMañana.toLocaleDateString('es-ES', opcionesFecha);
-
-        console.log(fechaMañana)
-        console.log(fechaPasadoMañana)
 
         if (!userStates[from]) {
             userStates[from] = { stage: "esperando_nombreApellido", data: {} };
