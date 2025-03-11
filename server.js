@@ -690,7 +690,19 @@ async function guardarEnBaseDeDatos(userData) {
             timeZone: "America/Bogota"
         }).replace("T", " ");
 
-        const estadoFinal = "Pendiente"
+        let estadoFinal
+
+        if (userData.stage === "Salio de la conversacion") {
+            estadoFinal = "No Continua"
+        } else if (userData.stage === "Completado") {
+            estadoFinal = "Pendiente"
+        } else if (userData.stage === "Tiempo Agotado") {
+            if (userData.data.cargo) {
+                estadoFinal = "Pendiente"
+            } else {
+                estadoFinal = "No Continua"
+            }
+        }
 
         const valores = [
             fechaRegistro,
