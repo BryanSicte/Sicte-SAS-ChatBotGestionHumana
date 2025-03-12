@@ -191,11 +191,11 @@ app.post("/webhook", async (req, res) => {
         let fechaPasadoMañana = diaPasadoMañana.toLocaleDateString('es-ES', opcionesFecha);
 
         if (!userStates[from]) {
-            userStates[from] = { stage: "esperando_nombreApellido", data: {} };
+            userStates[from] = { stage: "esperando_tratamientoDeDatos", data: {} };
 
             enviarMensajeTratamientoDeDatos(from);
 
-        } else if (userStates[from].stage === "esperando_tratamiento de datos") {
+        } else if (userStates[from].stage === "esperando_tratamientoDeDatos") {
 
             if (text === "aceptar_datos") {
                 userStates[from].stage = "esperando_nombreApellido";
