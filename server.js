@@ -30,7 +30,7 @@ async function obtenerCiudades() {
         const [rows] = await connection.execute("select * from ciudad_cargos");
         const ciudadesFiltradas = rows.filter(c => c.estado === "true");
 
-        
+
         ciudadesCache = ciudadesFiltradas;
         return ciudadesCache;
 
@@ -82,7 +82,7 @@ app.post("/webhook", async (req, res) => {
                 userStates[from].stage = "Salio de la conversacion";
             }
 
-            await guardarEnBaseDeDatos(userStates[from]); 
+            await guardarEnBaseDeDatos(userStates[from]);
 
             if (userTimers[from]) {
                 clearTimeout(userTimers[from]);
@@ -200,28 +200,29 @@ app.post("/webhook", async (req, res) => {
             `);
 
             await sendMessage(from, {
-                "recipient_type": "individual",
-                "to": from,
-                "type": "interactive",
-                "interactive": {
-                    "type": "button",
-                    "body": {
-                        "text": "¿Aceptas el tratamiento de tus datos personales según nuestra política de privacidad?"
+                messaging_product: "whatsapp",
+                recipient_type: "individual",
+                to: from,
+                type: "interactive",
+                interactive: {
+                    type: "button",
+                    body: {
+                        text: "¿Aceptas el tratamiento de tus datos personales según nuestra política de privacidad?"
                     },
-                    "action": {
-                        "buttons": [
+                    action: {
+                        buttons: [
                             {
-                                "type": "reply",
-                                "reply": {
-                                    "id": "aceptar_datos",
-                                    "title": "✅ Acepto"
+                                type: "reply",
+                                reply: {
+                                    id: "aceptar_datos",
+                                    title: "✅ Acepto"
                                 }
                             },
                             {
-                                "type": "reply",
-                                "reply": {
-                                    "id": "rechazar_datos",
-                                    "title": "❌ No acepto"
+                                type: "reply",
+                                reply: {
+                                    id: "rechazar_datos",
+                                    title: "❌ No acepto"
                                 }
                             }
                         ]
@@ -231,7 +232,7 @@ app.post("/webhook", async (req, res) => {
 
         } else if (userStates[from].stage === "esperando_tratamiento de datos") {
 
-            if (/^[a-zA-ZÀ-ÿ]+(\s[a-zA-ZÀ-ÿ]+){1,49}$/.test(text)) {
+            if (text === "aceptar_datos") {
                 userStates[from].stage = "esperando_nombreApellido";
                 userStates[from].data.aceptoDatos = "Acepto";
 
@@ -241,7 +242,7 @@ app.post("/webhook", async (req, res) => {
                 `;
 
                 await sendMessage(from, userInfo);
-            } else {
+            } else if (text === "rechazar_datos") {
                 userStates[from].data.aceptoDatos = "No acepto";
                 await sendMessage(from, "❌ No has aceptado el tratamiento de datos. No podemos continuar con el proceso.");
                 salirDeLaConversacion();
@@ -492,7 +493,7 @@ app.post("/webhook", async (req, res) => {
                 if (numeroIngresado === 2) {
 
                     userStates[from].data.respuestaFiltro2 = "No";
-                    
+
                     preguntaFiltro3();
 
                 } else if (numeroIngresado === 1) {
@@ -582,7 +583,7 @@ app.post("/webhook", async (req, res) => {
                 if (numeroIngresado === 1) {
 
                     userStates[from].data.detalleCargo = "Sí, quiero continuar con la oferta.";
-                    
+
                     fechasEntrevista();
 
                 } else if (numeroIngresado === 2) {
@@ -623,7 +624,7 @@ app.post("/webhook", async (req, res) => {
 
                 if (userStates[from].data.cargo === "Motorizados" || userStates[from].data.cargo === "Conductor") {
                     textoAdicional = `3. Fotocopia de la licencia de conducción.`
-                } else  {
+                } else {
                     textoAdicional = ``
                 }
 
@@ -638,7 +639,7 @@ app.post("/webhook", async (req, res) => {
 
                 console.log("Datos almacenados en userStates:", userStates[from]);
 
-                await guardarEnBaseDeDatos(userStates[from]); 
+                await guardarEnBaseDeDatos(userStates[from]);
 
                 delete userStates[from];
 
@@ -646,7 +647,7 @@ app.post("/webhook", async (req, res) => {
                 userStates[from].data.fechaHora = `No tengo disponibilidad para asistir`;
 
                 salirDeLaConversacion();
-                
+
             } else {
                 await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice un numero de la lista.");
             }
@@ -706,7 +707,7 @@ function restartUserTimer(user) {
 
     userTimers[user] = setTimeout(async () => {
         if (!userStates[user]) return;
-        
+
         const userInfo = `🕛 Tiempo de espera agotado para ${user}, Gracias por comunicarse con nosotros.`;
         console.log(userInfo);
         await sendMessage(user, userInfo);
@@ -714,7 +715,7 @@ function restartUserTimer(user) {
         userStates[user].stage = "Tiempo Agotado";
         console.log("Datos almacenados en userStates:", userStates[user]);
 
-        await guardarEnBaseDeDatos(userStates[user]); 
+        await guardarEnBaseDeDatos(userStates[user]);
 
         delete userStates[user];
         delete userTimers[user];
@@ -773,7 +774,7 @@ async function guardarEnBaseDeDatos(userData) {
     } catch (error) {
         console.error("❌ Error guardando en MySQL:", error);
 
-    }  finally {
+    } finally {
         if (connection) connection.release(); // Cerrar la conexión
     }
 }
