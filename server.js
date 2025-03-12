@@ -193,36 +193,7 @@ app.post("/webhook", async (req, res) => {
         if (!userStates[from]) {
             userStates[from] = { stage: "esperando_nombreApellido", data: {} };
 
-            await sendMessage(from, {
-                messaging_product: "whatsapp",
-                recipient_type: "individual",
-                to: from,
-                type: "interactive",
-                interactive: {
-                    type: "button",
-                    body: {
-                        text: "👋 ¡Hola! Te damos la bienvenida a Sicte SAS, una empresa líder en telecomunicaciones, te encuentras en contacto con Gestión Humana.\n📜 En cumplimiento de la Ley 1581 de 2012 y el Decreto 1377 de 2013, el tratamiento de tus datos personales se realizará conforme a nuestra política de privacidad.\nPuedes consultarla en: https://sicte.com/imagenes/certificados/politicadedatos.pdf.\n\n✅ ¿Aceptas estos términos?"
-                    },
-                    action: {
-                        buttons: [
-                            {
-                                type: "reply",
-                                reply: {
-                                    id: "aceptar_datos",
-                                    title: "✅ Acepto"
-                                }
-                            },
-                            {
-                                type: "reply",
-                                reply: {
-                                    id: "rechazar_datos",
-                                    title: "❌ No acepto"
-                                }
-                            }
-                        ]
-                    }
-                }
-            });
+            enviarMensajeTratamientoDeDatos(from);
 
         } else if (userStates[from].stage === "esperando_tratamiento de datos") {
 
@@ -664,6 +635,54 @@ app.post("/webhook", async (req, res) => {
 
     res.sendStatus(200);
 });
+
+// Función para enviar mensaje de tratamiento de datos
+const enviarMensajeTratamientoDeDatos = async (to) => {
+    try {
+        const response = await axios.post(
+            `https://graph.facebook.com/v21.0/${PHONE_NUMBER_ID}/messages`,
+            {
+                messaging_product: "whatsapp",
+                recipient_type: "individual",
+                to: to,
+                type: "interactive",
+                interactive: {
+                    type: "button",
+                    body: {
+                        text: "👋 ¡Hola! Te damos la bienvenida a Sicte SAS, una empresa líder en telecomunicaciones, te encuentras en contacto con Gestión Humana.\n📜 En cumplimiento de la Ley 1581 de 2012 y el Decreto 1377 de 2013, el tratamiento de tus datos personales se realizará conforme a nuestra política de privacidad.\nPuedes consultarla en: https://sicte.com/imagenes/certificados/politicadedatos.pdf.\n\n✅ ¿Aceptas estos términos?"
+                    },
+                    action: {
+                        buttons: [
+                            {
+                                type: "reply",
+                                reply: {
+                                    id: "aceptar_datos",
+                                    title: "✅ Acepto"
+                                }
+                            },
+                            {
+                                type: "reply",
+                                reply: {
+                                    id: "rechazar_datos",
+                                    title: "❌ No acepto"
+                                }
+                            }
+                        ]
+                    }
+                }
+            },
+            {
+                headers: {
+                    "Content-Type": "application/json",
+                    Authorization: `Bearer your_access_token`
+                }
+            }
+        );
+        console.log("Mensaje enviado:", response.data);
+    } catch (error) {
+        console.error("Error enviando mensaje:", error.response ? error.response.data : error.message);
+    }
+};
 
 // Función para enviar mensajes de WhatsApp
 async function sendMessage(to, text) {
