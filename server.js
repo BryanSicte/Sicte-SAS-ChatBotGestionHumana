@@ -76,7 +76,7 @@ app.post("/webhook", async (req, res) => {
             let nombre = userStates[from].data.nombreApellido.split(" ")[0];
             let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
 
-            await sendMessage(from, `🙏 ${nombreFormateado}, gracias por comunicarte con nosotros, en Sicte SAS. Recuerda que puedes revisar nuestra lista de ofertas en cualquier momento. ¡Estamos aquí para ayudarte!`);
+            await sendMessage(from, `😁 ${nombreFormateado}, gracias por comunicarte con nosotros, en Sicte SAS. Recuerda que puedes revisar nuestra lista de ofertas en cualquier momento. ¡Estamos aquí para ayudarte!`);
 
             if (userStates[from].stage !== 'Completado') {
                 userStates[from].stage = "Salio de la conversacion";
@@ -169,7 +169,7 @@ app.post("/webhook", async (req, res) => {
             const userInfo = `
                 🔹 ${nombreFormateado}, ¿Cuánto tiempo de antigüedad tiene tu licencia A2?
                 \nPor favor, selecciona la opción correspondiente colocando el número:
-                \n➊ Menos de 1 año.\n➋ Más de 1 año.\n➌ No tengo licencia A2.
+                \n➊ Menos de 6 meses.\n➋ Más de 6 meses.\n➌ No tengo licencia A2.
             `;
 
             await sendMessage(from, userInfo);
@@ -195,11 +195,57 @@ app.post("/webhook", async (req, res) => {
 
             await sendMessage(from, `
                 👋 ¡Hola! Te damos la bienvenida a Sicte SAS, una empresa líder en telecomunicaciones, te encuentras en contacto con Gestión Humana.
-                \n📜 Protección de Datos: En cumplimiento de la Ley 1581 de 2012 y el Decreto 1377 de 2013, el tratamiento de tus datos personales se realizará conforme a nuestra política de privacidad.
-                \n✅ Si decides continuar, aceptas estos términos.
-                \nPara comenzar, por favor ingresa tu nombre y apellido, para así continuar con el proceso.
-                \n¡Para nosotros es un gusto que nos contactes y poder avanzar juntos!
+                \n📜 En cumplimiento de la Ley 1581 de 2012 y el Decreto 1377 de 2013, el tratamiento de tus datos personales se realizará conforme a nuestra política de privacidad la cual la puedes consultar en el siguiente enlace https://sicte.com/imagenes/certificados/politicadedatos.pdf.
+                \n✅ Si decides continuar, debes aceptar estos términos.
             `);
+
+            await sendMessage(from, {
+                "recipient_type": "individual",
+                "to": from,
+                "type": "interactive",
+                "interactive": {
+                    "type": "button",
+                    "body": {
+                        "text": "¿Aceptas el tratamiento de tus datos personales según nuestra política de privacidad?"
+                    },
+                    "action": {
+                        "buttons": [
+                            {
+                                "type": "reply",
+                                "reply": {
+                                    "id": "aceptar_datos",
+                                    "title": "✅ Acepto"
+                                }
+                            },
+                            {
+                                "type": "reply",
+                                "reply": {
+                                    "id": "rechazar_datos",
+                                    "title": "❌ No acepto"
+                                }
+                            }
+                        ]
+                    }
+                }
+            });
+
+        } else if (userStates[from].stage === "esperando_tratamiento de datos") {
+
+            if (/^[a-zA-ZÀ-ÿ]+(\s[a-zA-ZÀ-ÿ]+){1,49}$/.test(text)) {
+                userStates[from].stage = "esperando_nombreApellido";
+                userStates[from].data.aceptoDatos = "Acepto";
+
+                const userInfo = `
+                    🔹 Para comenzar, por favor ingresa tu nombre y apellido, para así continuar con el proceso.
+                    \n¡Para nosotros es un gusto que nos contactes y poder avanzar juntos!
+                `;
+
+                await sendMessage(from, userInfo);
+            } else {
+                userStates[from].data.aceptoDatos = "No acepto";
+                await sendMessage(from, "❌ No has aceptado el tratamiento de datos. No podemos continuar con el proceso.");
+                salirDeLaConversacion();
+            }
 
         } else if (userStates[from].stage === "esperando_nombreApellido") {
 
@@ -311,12 +357,12 @@ app.post("/webhook", async (req, res) => {
                     detalleCargo = `🔹 ${nombreFormateado}, en este momento buscamos personas con motocicleta para realizar instalaciones de internet, televisión y telefonía en la ciudad ${userStates[from].data.ciudad}.
                         \n¡NO SE REQUIERE EXPERIENCIA NOSOTROS TE CAPACITAMOS!
                         \n¿Qué te ofrecemos?
-                        \n• Salario: $1.423.500 + $310.000 rodamiento + $200.000 auxilio de transporte + ¡Excelente! tabla de bonificaciones y todas las prestaciones de ley.\n• Contrato a término indefinido.\n• Plan carrera.\n•	Capacitación paga.\n• Se realiza curso de alturas una vez se firme contrato laboral.\n•	Horario: Lunes a sábado con disponibilidad de laborar 2 domingos.
+                        \n• Salario: $1.423.500 + $500.000 rodamiento + $200.000 auxilio de transporte + ¡Excelente! tabla de bonificaciones y todas las prestaciones de ley.\n• Contrato a término indefinido.\n• Plan carrera.\n•	Capacitación paga.\n• Se realiza curso de alturas una vez se firme contrato laboral.\n•	Horario: Lunes a sábado con disponibilidad de laborar 2 domingos.
                     `
                 } else if (cargoSeleccionado === "Conductor") {
                     detalleCargo = `🔹 ${nombreFormateado}, en este momento buscamos conductores con licencia C1 o C2 para realizar instalaciones de internet, televisión y telefonía en la ciudad ${userStates[from].data.ciudad}.
                         \n¿Qué te ofrecemos?
-                        \n• Salario: $1.423.500 + $500.000 rodamiento + $200.000 auxilio de transporte + ¡Excelente! tabla de bonificaciones y todas las prestaciones de ley.\n• Contrato a término indefinido.\n• Plan carrera.\n•	Capacitación paga.\n• Se realiza curso de alturas una vez se firme contrato laboral.\n•	Horario: Lunes a sábado con disponibilidad de laborar 2 domingos.
+                        \n• Salario: $1.423.500 + $310.000 aux. movilizacion + $200.000 auxilio de transporte + todas las prestaciones de ley.\n• Contrato a término indefinido.\n• Plan carrera.\n•	Capacitación paga.\n• Se realiza curso de alturas una vez se firme contrato laboral.\n•	Horario: Lunes a sábado con disponibilidad de laborar 2 domingos.
                     `
                 } else if (cargoSeleccionado === "Ayudante (Sin Moto)") {
                     detalleCargo = `🔹 ${nombreFormateado}, en este momento buscamos bachilleres para realizar instalaciones de internet, televisión y telefonía en la ciudad ${userStates[from].data.ciudad}.
@@ -413,9 +459,9 @@ app.post("/webhook", async (req, res) => {
                 if (numeroIngresado >= 1 && numeroIngresado <= 3) {
 
                     if (numeroIngresado === 1) {
-                        userStates[from].data.respuestaFiltro1 = "Si, menos de 1 año.";
+                        userStates[from].data.respuestaFiltro1 = "Si, menos de 6 meses.";
                     } else if (numeroIngresado === 2) {
-                        userStates[from].data.respuestaFiltro1 = "Si, más de 1 año.";
+                        userStates[from].data.respuestaFiltro1 = "Si, más de 6 meses.";
                     } else if (numeroIngresado === 3) {
                         userStates[from].data.respuestaFiltro1 = "No tengo experiencia certificada.";
                     }
@@ -582,7 +628,7 @@ app.post("/webhook", async (req, res) => {
                 }
 
                 const userInfo = `
-                🙏 ${nombreFormateado}, gracias por cofirmar tu asistencia, te espero el día ${userStates[from].data.fechaHora} en la dirección ${userStates[from].data.direccion} de la ciudad ${userStates[from].data.ciudad}.
+                😁 ${nombreFormateado}, gracias por cofirmar tu asistencia, te espero el día ${userStates[from].data.fechaHora} en la dirección ${userStates[from].data.direccion} de la ciudad ${userStates[from].data.ciudad}.
                 \nPor favor no olvides traer los siguientes documentos:
                 \n1. Hoja de vida actualizada\n2. Fotocopia de la cedula al 150%\n${textoAdicional}
                 \n👋 Gracias por comunicarse con nosotros.
@@ -682,8 +728,8 @@ async function guardarEnBaseDeDatos(userData) {
         connection = await pool.getConnection();
 
         const sql = `
-            INSERT INTO registros_chatbot (registro, stage, nombreApellido, celular, ciudad, cargo, detalleCargo, respuestaFiltro1, respuestaFiltro2, respuestaFiltro3, direccion, fechaHora, estadoFinal)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO registros_chatbot (registro, stage, aceptoPolitica, nombreApellido, celular, ciudad, cargo, detalleCargo, respuestaFiltro1, respuestaFiltro2, respuestaFiltro3, direccion, fechaHora, estadoFinal)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
         const fechaRegistro = new Date().toLocaleString("en-CA", {
@@ -707,6 +753,7 @@ async function guardarEnBaseDeDatos(userData) {
         const valores = [
             fechaRegistro,
             userData.stage ?? null,
+            userData.data.aceptoDatos ?? null,
             userData.data.nombreApellido ?? null,
             userData.data.celular ?? null,
             userData.data.ciudad ?? null,
