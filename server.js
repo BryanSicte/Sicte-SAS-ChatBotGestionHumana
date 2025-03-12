@@ -377,7 +377,7 @@ app.post("/webhook", async (req, res) => {
 
                 if (userStates[from].data.cargo === "Motorizados") {
                     userInfo = `
-                        🔹 ${nombreFormateado}, nos alegra que continues en el proceso, ¿Cuentas con motocicleta propia? 
+                        🔹 ${nombreFormateado}, nos alegra que continues en el proceso, ¿Cuentas con motocicleta? 
                         \n➊ Si\n➋ No
                     `;
                 } else if (userStates[from].data.cargo === "Conductor") {
