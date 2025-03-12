@@ -75,13 +75,13 @@ app.post("/webhook", async (req, res) => {
 
             if (userStates[from].stage === 'esperando_tratamientoDeDatos') {
 
-                await sendMessage(from, `😁 Gracias por comunicarte con nosotros, en Sicte SAS. Recuerda que puedes revisar nuestra lista de ofertas en cualquier momento. ¡Estamos aquí para ayudarte!`);
+                await sendMessage(from, `🔹 Gracias por comunicarte con nosotros, en Sicte SAS. Recuerda que puedes revisar nuestra lista de ofertas en cualquier momento. ¡Estamos aquí para ayudarte!`);
             } else {
 
                 let nombre = userStates[from].data.nombreApellido.split(" ")[0];
                 let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
 
-                await sendMessage(from, `😁 ${nombreFormateado}, gracias por comunicarte con nosotros, en Sicte SAS. Recuerda que puedes revisar nuestra lista de ofertas en cualquier momento. ¡Estamos aquí para ayudarte!`);
+                await sendMessage(from, `🔹 ${nombreFormateado}, gracias por comunicarte con nosotros, en Sicte SAS. Recuerda que puedes revisar nuestra lista de ofertas en cualquier momento. ¡Estamos aquí para ayudarte!`);
             }
 
             if (userStates[from].stage !== 'Completado') {
@@ -219,6 +219,8 @@ app.post("/webhook", async (req, res) => {
                     userStates[from].data.aceptoDatos = "No acepto";
                     await sendMessage(from, "❌ No has aceptado el tratamiento de datos. No podemos continuar con el proceso.");
                     salirDeLaConversacion();
+                } else {
+                    await sendMessage(from, "⚠️ La opcion ingresada no es válida. Por favor, seleccione una opcion.");
                 }
             }
 
@@ -337,7 +339,7 @@ app.post("/webhook", async (req, res) => {
                 } else if (cargoSeleccionado === "Conductor") {
                     detalleCargo = `🔹 ${nombreFormateado}, en este momento buscamos conductores con licencia C1 o C2 para realizar instalaciones de internet, televisión y telefonía en la ciudad ${userStates[from].data.ciudad}.
                         \n¿Qué te ofrecemos?
-                        \n• Salario: $1.423.500 + $310.000 aux. movilizacion + $200.000 auxilio de transporte + todas las prestaciones de ley.\n• Contrato a término indefinido.\n• Plan carrera.\n•	Capacitación paga.\n• Se realiza curso de alturas una vez se firme contrato laboral.\n•	Horario: Lunes a sábado con disponibilidad de laborar 2 domingos.
+                        \n• Salario: $1.423.500 + $310.000 aux. movilizacion + $200.000 auxilio de transporte + todas las prestaciones de ley.\n• Contrato a término indefinido.\n• Plan carrera.\n• Capacitación paga.\n• Se realiza curso de alturas una vez se firme contrato laboral.\n• Horario: Lunes a sábado con disponibilidad de laborar 2 domingos.
                     `
                 } else if (cargoSeleccionado === "Ayudante (Sin Moto)") {
                     detalleCargo = `🔹 ${nombreFormateado}, en este momento buscamos bachilleres para realizar instalaciones de internet, televisión y telefonía en la ciudad ${userStates[from].data.ciudad}.
@@ -603,10 +605,10 @@ app.post("/webhook", async (req, res) => {
                 }
 
                 const userInfo = `
-                😁 ${nombreFormateado}, gracias por cofirmar tu asistencia, te espero el día ${userStates[from].data.fechaHora} en la dirección ${userStates[from].data.direccion} de la ciudad ${userStates[from].data.ciudad}.
+                🔹 ${nombreFormateado}, gracias por confirmar tu asistencia, te espero el día ${userStates[from].data.fechaHora} en la dirección ${userStates[from].data.direccion} de la ciudad ${userStates[from].data.ciudad}.
                 \nPor favor no olvides traer los siguientes documentos:
                 \n1. Hoja de vida actualizada\n2. Fotocopia de la cedula al 150%\n${textoAdicional}
-                \n👋 Gracias por comunicarse con nosotros.
+                \n👋 Gracias por comunicarte con nosotros.
                 `;
 
                 await sendMessage(from, userInfo);
