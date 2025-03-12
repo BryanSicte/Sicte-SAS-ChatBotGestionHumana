@@ -196,21 +196,24 @@ app.post("/webhook", async (req, res) => {
             enviarMensajeTratamientoDeDatos(from);
 
         } else if (userStates[from].stage === "esperando_tratamientoDeDatos") {
+            if (message.interactive && message.interactive.button_reply) {
+                const buttonId = message.interactive.button_reply.id;
 
-            if (text === "aceptar_datos") {
-                userStates[from].stage = "esperando_nombreApellido";
-                userStates[from].data.aceptoDatos = "Acepto";
+                if (buttonId === "aceptar_datos") {
+                    userStates[from].stage = "esperando_nombreApellido";
+                    userStates[from].data.aceptoDatos = "Acepto";
 
-                const userInfo = `
+                    const userInfo = `
                     🔹 Para comenzar, por favor ingresa tu nombre y apellido, para así continuar con el proceso.
                     \n¡Para nosotros es un gusto que nos contactes y poder avanzar juntos!
                 `;
 
-                await sendMessage(from, userInfo);
-            } else if (text === "rechazar_datos") {
-                userStates[from].data.aceptoDatos = "No acepto";
-                await sendMessage(from, "❌ No has aceptado el tratamiento de datos. No podemos continuar con el proceso.");
-                salirDeLaConversacion();
+                    await sendMessage(from, userInfo);
+                } else if (buttonId === "rechazar_datos") {
+                    userStates[from].data.aceptoDatos = "No acepto";
+                    await sendMessage(from, "❌ No has aceptado el tratamiento de datos. No podemos continuar con el proceso.");
+                    salirDeLaConversacion();
+                }
             }
 
         } else if (userStates[from].stage === "esperando_nombreApellido") {
