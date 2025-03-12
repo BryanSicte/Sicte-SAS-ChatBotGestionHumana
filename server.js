@@ -193,12 +193,6 @@ app.post("/webhook", async (req, res) => {
         if (!userStates[from]) {
             userStates[from] = { stage: "esperando_nombreApellido", data: {} };
 
-            await sendMessage(from, `
-                👋 ¡Hola! Te damos la bienvenida a Sicte SAS, una empresa líder en telecomunicaciones, te encuentras en contacto con Gestión Humana.
-                \n📜 En cumplimiento de la Ley 1581 de 2012 y el Decreto 1377 de 2013, el tratamiento de tus datos personales se realizará conforme a nuestra política de privacidad la cual la puedes consultar en el siguiente enlace https://sicte.com/imagenes/certificados/politicadedatos.pdf.
-                \n✅ Si decides continuar, debes aceptar estos términos.
-            `);
-
             await sendMessage(from, {
                 messaging_product: "whatsapp",
                 recipient_type: "individual",
@@ -207,7 +201,7 @@ app.post("/webhook", async (req, res) => {
                 interactive: {
                     type: "button",
                     body: {
-                        text: "¿Aceptas el tratamiento de tus datos personales según nuestra política de privacidad?"
+                        text: "👋 ¡Hola! Te damos la bienvenida a Sicte SAS, una empresa líder en telecomunicaciones, te encuentras en contacto con Gestión Humana.\n📜 En cumplimiento de la Ley 1581 de 2012 y el Decreto 1377 de 2013, el tratamiento de tus datos personales se realizará conforme a nuestra política de privacidad.\nPuedes consultarla en: https://sicte.com/imagenes/certificados/politicadedatos.pdf.\n\n✅ ¿Aceptas estos términos?"
                     },
                     action: {
                         buttons: [
