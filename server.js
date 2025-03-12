@@ -622,6 +622,12 @@ app.post("/webhook", async (req, res) => {
             } else if (numeroIngresado === 5) {
                 userStates[from].data.fechaHora = `No tengo disponibilidad para asistir`;
 
+                const userInfo = `
+                🔹 ${nombreFormateado}, me estare comunicando contigo en las proximas horas para validar tu disponibilidad.
+                `;
+
+                await sendMessage(from, userInfo);
+
                 salirDeLaConversacion();
 
             } else {
@@ -743,7 +749,7 @@ function restartUserTimer(user) {
 
         delete userStates[user];
         delete userTimers[user];
-    }, 60 * 1000);
+    }, 10 * 60 * 1000); // 10 minutos
 }
 
 async function guardarEnBaseDeDatos(userData) {
