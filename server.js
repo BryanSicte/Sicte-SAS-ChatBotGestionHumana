@@ -674,7 +674,7 @@ const enviarMensajeTratamientoDeDatos = async (to) => {
             {
                 headers: {
                     "Content-Type": "application/json",
-                    Authorization: `Bearer your_access_token`
+                    Authorization: `Bearer ${TOKEN}`
                 }
             }
         );
