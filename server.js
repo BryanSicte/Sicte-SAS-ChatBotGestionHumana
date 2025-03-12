@@ -73,10 +73,16 @@ app.post("/webhook", async (req, res) => {
         async function salirDeLaConversacion() {
             console.log("Datos almacenados en userStates:", userStates[from]);
 
-            let nombre = userStates[from].data.nombreApellido.split(" ")[0];
-            let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
+            if (userStates[from].stage === 'esperando_tratamientoDeDatos') {
 
-            await sendMessage(from, `😁 ${nombreFormateado}, gracias por comunicarte con nosotros, en Sicte SAS. Recuerda que puedes revisar nuestra lista de ofertas en cualquier momento. ¡Estamos aquí para ayudarte!`);
+                await sendMessage(from, `😁 Gracias por comunicarte con nosotros, en Sicte SAS. Recuerda que puedes revisar nuestra lista de ofertas en cualquier momento. ¡Estamos aquí para ayudarte!`);
+            } else {
+
+                let nombre = userStates[from].data.nombreApellido.split(" ")[0];
+                let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
+
+                await sendMessage(from, `😁 ${nombreFormateado}, gracias por comunicarte con nosotros, en Sicte SAS. Recuerda que puedes revisar nuestra lista de ofertas en cualquier momento. ¡Estamos aquí para ayudarte!`);
+            }
 
             if (userStates[from].stage !== 'Completado') {
                 userStates[from].stage = "Salio de la conversacion";
