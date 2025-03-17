@@ -725,6 +725,37 @@ async function sendMessage(to, text) {
     }
 }
 
+app.post("/enviar-mensaje", async (req, res) => {
+    const { numero, mensaje } = req.body;
+
+    if (!numero || !mensaje) {
+        return res.status(400).json({ error: "Número y mensaje son requeridos" });
+    }
+
+    try {
+        const response = await axios.post(
+            `https://graph.facebook.com/v21.0/${PHONE_NUMBER_ID}/messages`,
+            {
+                messaging_product: "whatsapp",
+                to: numero,
+                type: "text",
+                text: { body: mensaje },
+            },
+            {
+                headers: {
+                    Authorization: `Bearer ${TOKEN}`,
+                    "Content-Type": "application/json",
+                },
+            }
+        );
+
+        res.status(200).json({ success: true, data: response.data });
+    } catch (error) {
+        console.error("❌ Error al enviar mensaje:", error.response?.data || error.message);
+        res.status(500).json({ error: "Error al enviar el mensaje" });
+    }
+});
+
 // Función para reiniciar el temporizador de usuario
 function restartUserTimer(user) {
     if (userTimers[user]) {
