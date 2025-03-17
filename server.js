@@ -741,7 +741,7 @@ app.post("/enviar-mensaje", async (req, res) => {
                 type: "template",
                 template: {
                     name: "confirmacion_entrevista", // Nombre de tu plantilla
-                    language: { code: "es" },
+                    language: { code: "es_CO" },
                     components: [
                         {
                             type: "body",
