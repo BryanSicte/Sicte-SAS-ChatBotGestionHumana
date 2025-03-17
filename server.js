@@ -88,7 +88,7 @@ app.post("/webhook", async (req, res) => {
                 userStates[from].stage = "Salio de la conversacion";
             }
 
-            await guardarEnBaseDeDatos(userStates[from]);
+            await guardarEnBaseDeDatos(userStates[from], from);
 
             if (userTimers[from]) {
                 clearTimeout(userTimers[from]);
@@ -615,7 +615,7 @@ app.post("/webhook", async (req, res) => {
 
                 console.log("Datos almacenados en userStates:", userStates[from]);
 
-                await guardarEnBaseDeDatos(userStates[from]);
+                await guardarEnBaseDeDatos(userStates[from], from);
 
                 delete userStates[from];
 
@@ -789,14 +789,14 @@ function restartUserTimer(user) {
         userStates[user].stage = "Tiempo Agotado";
         console.log("Datos almacenados en userStates:", userStates[user]);
 
-        await guardarEnBaseDeDatos(userStates[user]);
+        await guardarEnBaseDeDatos(userStates[user], user);
 
         delete userStates[user];
         delete userTimers[user];
     }, 30 * 60 * 1000); // 10 minutos
 }
 
-async function guardarEnBaseDeDatos(userData) {
+async function guardarEnBaseDeDatos(userData, from) {
     let connection;
 
     try {
@@ -825,11 +825,11 @@ async function guardarEnBaseDeDatos(userData) {
                 estadoFinal = "No Continua"
             }
         }
-
+        
         const valores = [
             fechaRegistro,
             userData.stage ?? null,
-            userData.stage ?? null,
+            userData.data.aceptoDatos === 'Acepto' ? from : null,
             userData.data.aceptoDatos ?? null,
             userData.data.nombreApellido ?? null,
             userData.data.celular ?? null,
