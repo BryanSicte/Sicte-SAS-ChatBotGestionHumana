@@ -300,8 +300,8 @@ app.post("/webhook", async (req, res) => {
                 let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
 
                 const userInfo = `
-                    🔹 ¡Hola ${nombreFormateado}! Mi nombre es ${personasUnicas} es un gusto saludarte. A continuación, te compartimos los cargos disponibles:
-                    \nPor favor, indícanos el número del cargo que más te interese para recibir más información.
+                    🔹 ¡Hola ${nombreFormateado}! Mi nombre es ${personasUnicas} es un gusto saludarte. Soy la persona encargada del proceso de selección en ${userStates[from].data.ciudad} y te estaré acompañando de aquí en adelante. A continuación, te comparto los cargos disponibles:
+                    \nPor favor, indícame el número del cargo que más te interese para ampliar la información.
                     ${listaCargos}
                 `;
 
@@ -666,7 +666,7 @@ const enviarMensajeTratamientoDeDatos = async (to) => {
                 interactive: {
                     type: "button",
                     body: {
-                        text: "👋 ¡Hola! Te damos la bienvenida a Sicte SAS, una empresa líder en telecomunicaciones, te encuentras en contacto con Gestión Humana.\n📜 En cumplimiento de la Ley 1581 de 2012 y el Decreto 1377 de 2013, el tratamiento de tus datos personales se realizará conforme a nuestra política de privacidad.\nPuedes consultarla en: https://sicte.com/imagenes/certificados/politicadedatos.pdf.\n\n✅ ¿Aceptas estos términos?"
+                        text: "¡Hola! Te damos la bienvenida a Sicte SAS, una empresa líder en telecomunicaciones, te encuentras en contacto con Esteban Morales del equipo de Gestión Humana.\n📜 Antes de iniciar y en cumplimiento de la Ley 1581 de 2012 y el Decreto 1377 de 2013, te informo que el tratamiento de tus datos personales se realizará conforme a nuestra política de privacidad que puedes consultar en: https://sicte.com/imagenes/certificados/politicadedatos.pdf.\n\n✅ ¿Aceptas estos términos?"
                     },
                     action: {
                         buttons: [
