@@ -740,7 +740,7 @@ app.post("/enviar-mensaje", async (req, res) => {
                 to: numero,
                 type: "template",
                 template: {
-                    name: "confirmacion_entrevista", // Nombre de tu plantilla
+                    name: "confirmacion_entrevista",
                     language: { code: "es_CO" },
                     components: [
                         {
@@ -793,7 +793,7 @@ function restartUserTimer(user) {
 
         delete userStates[user];
         delete userTimers[user];
-    }, 10 * 60 * 1000); // 10 minutos
+    }, 30 * 60 * 1000); // 10 minutos
 }
 
 async function guardarEnBaseDeDatos(userData) {
@@ -801,10 +801,11 @@ async function guardarEnBaseDeDatos(userData) {
 
     try {
         connection = await pool.getConnection();
+        console.log(userData)
 
         const sql = `
-            INSERT INTO registros_chatbot (registro, stage, aceptoPolitica, nombreApellido, celular, ciudad, cargo, detalleCargo, respuestaFiltro1, respuestaFiltro2, respuestaFiltro3, direccion, fechaHora, estadoFinal)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO registros_chatbot (registro, stage, celularChat, aceptoPolitica, nombreApellido, celular, ciudad, cargo, detalleCargo, respuestaFiltro1, respuestaFiltro2, respuestaFiltro3, direccion, fechaHora, estadoFinal)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
         const fechaRegistro = new Date().toLocaleString("en-CA", {
@@ -827,6 +828,7 @@ async function guardarEnBaseDeDatos(userData) {
 
         const valores = [
             fechaRegistro,
+            userData.stage ?? null,
             userData.stage ?? null,
             userData.data.aceptoDatos ?? null,
             userData.data.nombreApellido ?? null,
