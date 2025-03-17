@@ -726,10 +726,10 @@ async function sendMessage(to, text) {
 }
 
 app.post("/enviar-mensaje", async (req, res) => {
-    const { numero, mensaje } = req.body;
+    const { numero, nombre, direccion, fecha } = req.body;
 
-    if (!numero || !mensaje) {
-        return res.status(400).json({ error: "Número y mensaje son requeridos" });
+    if (!numero || !nombre || !direccion || !fecha) {
+        return res.status(400).json({ error: "Numero, nombre, direccion y fecha son requeridos" });
     }
 
     try {
@@ -738,8 +738,21 @@ app.post("/enviar-mensaje", async (req, res) => {
             {
                 messaging_product: "whatsapp",
                 to: numero,
-                type: "text",
-                text: { body: mensaje },
+                type: "template",
+                template: {
+                    name: "confirmacion_entrevista", // Nombre de tu plantilla
+                    language: { code: "es" },
+                    components: [
+                        {
+                            type: "body",
+                            parameters: [
+                                { type: "text", text: nombre },
+                                { type: "text", text: direccion },
+                                { type: "text", text: fecha }
+                            ]
+                        }
+                    ]
+                }
             },
             {
                 headers: {
