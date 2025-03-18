@@ -252,7 +252,7 @@ app.post("/webhook", async (req, res) => {
                 .map((ciudad, index) => `\n ${numerosIconos[index] || index + 1} ${ciudad}`)
                 .join("");
 
-            if (/^\d{10}$/.test(text)) {
+            if (/^3\d{9}$/.test(text)) {
                 userStates[from].data.celular = text;
                 userStates[from].stage = "esperando_ciudad";
 
@@ -604,8 +604,14 @@ app.post("/webhook", async (req, res) => {
                     textoAdicional = ``
                 }
 
+                const PersonasDisponibles = ciudadesCache
+                    .filter(c => c.Ciudad === userStates[from].data.ciudad)
+                    .map(c => c.Nombre);
+
+                const personasUnicas = [...new Set(PersonasDisponibles)].sort();
+
                 const userInfo = `
-                🔹 ${nombreFormateado}, gracias por confirmar tu asistencia, te espero el día ${userStates[from].data.fechaHora} en la dirección ${userStates[from].data.direccion} de la ciudad ${userStates[from].data.ciudad}.
+                🔹 ${nombreFormateado}, gracias por confirmar tu asistencia, recuerda que mi nombre es ${personasUnicas} y te espero el día ${userStates[from].data.fechaHora} en la dirección ${userStates[from].data.direccion} de la ciudad ${userStates[from].data.ciudad}.
                 \nPor favor no olvides traer los siguientes documentos:
                 \n1. Hoja de vida actualizada\n2. Fotocopia de la cedula al 150%\n${textoAdicional}
                 \n👋 Gracias por comunicarte con nosotros.
@@ -819,13 +825,13 @@ async function guardarEnBaseDeDatos(userData, from) {
         } else if (userData.stage === "Completado") {
             estadoFinal = "Pendiente"
         } else if (userData.stage === "Tiempo Agotado") {
-            if (userData.data.cargo) {
+            if (userData.data.nombreApellido) {
                 estadoFinal = "Pendiente"
             } else {
                 estadoFinal = "No Continua"
             }
         }
-        
+
         const valores = [
             fechaRegistro,
             userData.stage ?? null,
