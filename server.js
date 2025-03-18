@@ -1,11 +1,10 @@
 require("dotenv").config();
 const express = require("express");
 const axios = require("axios");
+const Holidays = require('date-holidays');
 const app = express();
 const PORT = 3000;
 app.use(express.json());
-
-import Holidays from 'date-holidays';
 
 const TOKEN = process.env.WHATSAPP_TOKEN;
 const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
