@@ -607,8 +607,8 @@ app.post("/webhook", async (req, res) => {
             let nombre = userStates[from].data.nombreApellido.split(" ")[0];
             let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
 
-            const ahora = new Date();
-            const horaActual = ahora.getHours();
+            const ahora = new Date().toLocaleString("en-US", { timeZone: "America/Bogota" });
+            const horaActual = new Date(ahora).getHours();
 
             const numeroIngresado = parseInt(text, 10);
             if ((numeroIngresado === 1 && horaActual < 16) || (numeroIngresado >= 2 && numeroIngresado <= 4)) {
