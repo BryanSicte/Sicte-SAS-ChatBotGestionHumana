@@ -165,8 +165,8 @@ app.post("/webhook", async (req, res) => {
             userStates[from].stage = "Completado";
             userStates[from].data.direccion = direccion;
 
-            const ahora = new Date();
-            const horaActual = ahora.getHours();
+            const ahora = new Date().toLocaleString("en-US", { timeZone: "America/Bogota" });
+            const horaActual = new Date(ahora).getHours();
 
             let opciones = [
                 `➊ ${fechaMañana} a las 8:30 am.`,
@@ -175,6 +175,8 @@ app.post("/webhook", async (req, res) => {
                 `➍ ${fechaPasadoMañana} a las 2:00 pm.`,
                 `➎ No tengo disponibilidad para asistir.`
             ];
+
+            console.log(horaActual)
 
             if (horaActual >= 16) {
                 opciones.shift(); // Elimina la primera opción (8:30 am de mañana)
