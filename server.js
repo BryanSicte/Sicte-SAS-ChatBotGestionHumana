@@ -5,6 +5,8 @@ const app = express();
 const PORT = 3000;
 app.use(express.json());
 
+import Holidays from 'date-holidays';
+
 const TOKEN = process.env.WHATSAPP_TOKEN;
 const PHONE_NUMBER_ID = process.env.PHONE_NUMBER_ID;
 
@@ -59,12 +61,18 @@ app.post("/webhook", async (req, res) => {
     const message = req.body.entry?.[0]?.changes?.[0]?.value?.messages?.[0];
 
     if (message) {
+        const hd = new Holidays('CO'); // Configura Colombia como país
+
+        function esFestivo(fecha) {
+            return hd.isHoliday(fecha) !== false; // Devuelve true si es festivo
+        }
+
         function obtenerDiaHabil(hoy, diasSumar) {
             let nuevoDia = new Date(hoy);
             nuevoDia.setDate(hoy.getDate() + diasSumar);
 
-            while (nuevoDia.getDay() === 0 || nuevoDia.getDay() === 6) {
-                nuevoDia.setDate(nuevoDia.getDate() + 1);
+            while (nuevoDia.getDay() === 0 || nuevoDia.getDay() === 6 || esFestivo(nuevoDia)) {
+                nuevoDia.setDate(nuevoDia.getDate() + 1); // Avanza al siguiente día
             }
 
             return nuevoDia;
@@ -158,9 +166,24 @@ app.post("/webhook", async (req, res) => {
             userStates[from].stage = "Completado";
             userStates[from].data.direccion = direccion;
 
+            const ahora = new Date();
+            const horaActual = ahora.getHours();
+
+            let opciones = [
+                `➊ ${fechaMañana} a las 8:30 am.`,
+                `➋ ${fechaMañana} a las 2:00 pm.`,
+                `➌ ${fechaPasadoMañana} a las 8:30 am.`,
+                `➍ ${fechaPasadoMañana} a las 2:00 pm.`,
+                `➎ No tengo disponibilidad para asistir.`
+            ];
+
+            if (horaActual >= 16) {
+                opciones.shift(); // Elimina la primera opción (8:30 am de mañana)
+            }
+
             const userInfo = `
             🔹 ${nombreFormateado}, el siguiente paso es agendar una entrevista presencial para conocerte mejor y resolver tus inquietudes, por favor indícanos cuando tienes disponibilidad para presentarte en la dirección ${direccion} de la ciudad ${userStates[from].data.ciudad}.
-            \n➊ ${fechaMañana} a las 8:30 am.\n➋ ${fechaMañana} a las 2:00 pm.\n➌ ${fechaPasadoMañana} a las 8:30 am.\n➍ ${fechaPasadoMañana} a las 2:00 pm.\n➎ No tengo disponibilidad para asistir.
+            \n${opciones.join("\n")}
             `;
 
             await sendMessage(from, userInfo);
@@ -398,7 +421,7 @@ app.post("/webhook", async (req, res) => {
                 salirDeLaConversacion();
 
             } else {
-                await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice un numero de 1 a 3.");
+                await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indique un numero de 1 a 3.");
             }
 
         } else if (userStates[from].stage === "esperando_filtro2") {
@@ -427,7 +450,7 @@ app.post("/webhook", async (req, res) => {
 
                     preguntaFiltro3();
                 } else {
-                    await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice 1 para Si o 2 para No.");
+                    await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indique 1 para Si o 2 para No.");
                 }
 
             } else if (userStates[from].data.cargo === "Conductor") {
@@ -486,7 +509,7 @@ app.post("/webhook", async (req, res) => {
 
                     preguntaMirarOtrosCargos();
                 } else {
-                    await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice 1 para Si o 2 para No.");
+                    await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indique 1 para Si o 2 para No.");
                 }
             }
 
@@ -519,7 +542,7 @@ app.post("/webhook", async (req, res) => {
 
                     preguntaMirarOtrosCargos();
                 } else {
-                    await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice un numero de 1 a 3.");
+                    await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indique un numero de 1 a 3.");
                 }
 
             } else if (userStates[from].data.cargo === "Conductor") {
@@ -550,7 +573,7 @@ app.post("/webhook", async (req, res) => {
                     preguntaMirarOtrosCargos();
 
                 } else {
-                    await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice un numero de 1 a 4.");
+                    await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indique un numero de 1 a 4.");
                 }
 
             } else if (userStates[from].data.cargo === "Ayudante (Sin Moto)") {
@@ -571,11 +594,11 @@ app.post("/webhook", async (req, res) => {
                     salirDeLaConversacion();
 
                 } else {
-                    await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice un numero de 1 a 3.");
+                    await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indique un numero de 1 a 3.");
                 }
 
             } else {
-                await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice 1 para Si o 2 para No.");
+                await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indique 1 para Si o 2 para No.");
             }
 
         } else if (userStates[from].stage === "Completado") {
@@ -583,8 +606,11 @@ app.post("/webhook", async (req, res) => {
             let nombre = userStates[from].data.nombreApellido.split(" ")[0];
             let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
 
+            const ahora = new Date();
+            const horaActual = ahora.getHours();
+
             const numeroIngresado = parseInt(text, 10);
-            if (numeroIngresado >= 1 && numeroIngresado <= 4) {
+            if ((numeroIngresado === 1 && horaActual < 16) || (numeroIngresado >= 2 && numeroIngresado <= 4)) {
 
                 if (numeroIngresado === 1) {
                     userStates[from].data.fechaHora = `${fechaMañana} a las 8:30 am`;
@@ -637,7 +663,7 @@ app.post("/webhook", async (req, res) => {
                 salirDeLaConversacion();
 
             } else {
-                await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice un numero de la lista.");
+                await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indique un numero de la lista.");
             }
 
         } else if (userStates[from].stage === "esperando_otroCargo") {
@@ -651,7 +677,7 @@ app.post("/webhook", async (req, res) => {
                 salirDeLaConversacion();
 
             } else {
-                await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indice un numero de la lista.");
+                await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indique un numero de la lista.");
             }
         }
     }
