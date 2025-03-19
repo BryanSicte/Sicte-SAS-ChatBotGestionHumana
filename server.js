@@ -759,10 +759,10 @@ async function sendMessage(to, text) {
 }
 
 app.post("/enviar-mensaje", async (req, res) => {
-    const { numero, nombre, direccion, fecha } = req.body;
+    const { numero, nombre, fecha, direccion, ciudad, nombreGH, numeroGH } = req.body;
 
-    if (!numero || !nombre || !direccion || !fecha) {
-        return res.status(400).json({ error: "Numero, nombre, direccion y fecha son requeridos" });
+    if (!numero || !nombre || !fecha || !direccion || !ciudad || !nombreGH || !numeroGH) {
+        return res.status(400).json({ error: "Numero, nombre, fecha, direccion, ciudad, nombreGH y numeroGH son requeridos" });
     }
 
     try {
@@ -780,8 +780,11 @@ app.post("/enviar-mensaje", async (req, res) => {
                             type: "body",
                             parameters: [
                                 { type: "text", text: nombre },
+                                { type: "text", text: fecha },
                                 { type: "text", text: direccion },
-                                { type: "text", text: fecha }
+                                { type: "text", text: ciudad },
+                                { type: "text", text: nombreGH },
+                                { type: "text", text: numeroGH }
                             ]
                         }
                     ]
