@@ -258,7 +258,7 @@ app.post("/webhook", async (req, res) => {
                 let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
 
                 const userInfo = `
-                    🔹 Hola ${nombreFormateado}, para continuar con el proceso, por favor ingresa tu número de celular:
+                    🔹 Hola ${nombreFormateado}, para continuar con el proceso, *por favor ingresa tu número de celular*:
                 `;
 
                 await sendMessage(from, userInfo);
