@@ -637,11 +637,17 @@ app.post("/webhook", async (req, res) => {
 
                 const personasUnicas = [...new Set(PersonasDisponibles)].sort();
 
+                const NumerosDisponibles = ciudadesCache
+                    .filter(c => c.Ciudad === userStates[from].data.ciudad)
+                    .map(c => c.Celular);
+
+                const numerosUnicos = [...new Set(NumerosDisponibles)].sort();
+
                 const userInfo = `
                 🔹 ${nombreFormateado}, gracias por confirmar tu asistencia, recuerda que mi nombre es ${personasUnicas} y te espero el día ${userStates[from].data.fechaHora} en la dirección ${userStates[from].data.direccion} de la ciudad ${userStates[from].data.ciudad}.
                 \nPor favor no olvides traer los siguientes documentos:
                 \n1. Hoja de vida actualizada\n2. Fotocopia de la cedula al 150%\n${textoAdicional}
-                \n👋 Gracias por comunicarte con nosotros.
+                \nSi tienes alguna inquietud puedes contactarme al número de teléfono ${numerosUnicos}\n👋 Ten un excelente dia.
                 `;
 
                 await sendMessage(from, userInfo);
@@ -655,13 +661,32 @@ app.post("/webhook", async (req, res) => {
             } else if (numeroIngresado === 5) {
                 userStates[from].data.fechaHora = `No tengo disponibilidad para asistir`;
 
+                const PersonasDisponibles = ciudadesCache
+                    .filter(c => c.Ciudad === userStates[from].data.ciudad)
+                    .map(c => c.Nombre);
+
+                const personasUnicas = [...new Set(PersonasDisponibles)].sort();
+
+                const NumerosDisponibles = ciudadesCache
+                    .filter(c => c.Ciudad === userStates[from].data.ciudad)
+                    .map(c => c.Celular);
+
+                const numerosUnicos = [...new Set(NumerosDisponibles)].sort();
+
                 const userInfo = `
-                🔹 ${nombreFormateado}, me estare comunicando contigo en las proximas horas para validar tu disponibilidad.
+                🔹 ${nombreFormateado}, gracias por comunicarte con nosotros, mi nombre es ${personasUnicas} y me estare comunicando contigo para validar tu disponibilidad. Recuerda que si tienes alguna inquietud puedes contactarme al numero ${numerosUnicos}.
                 `;
 
                 await sendMessage(from, userInfo);
 
-                salirDeLaConversacion();
+                await guardarEnBaseDeDatos(userStates[from], from);
+
+                if (userTimers[from]) {
+                    clearTimeout(userTimers[from]);
+                    delete userTimers[from];
+                }
+
+                delete userStates[from];
 
             } else {
                 await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indique un numero de la lista.");
@@ -840,8 +865,8 @@ async function guardarEnBaseDeDatos(userData, from) {
         console.log(userData)
 
         const sql = `
-            INSERT INTO registros_chatbot (registro, stage, celularChat, aceptoPolitica, nombreApellido, celular, ciudad, cargo, detalleCargo, respuestaFiltro1, respuestaFiltro2, respuestaFiltro3, direccion, fechaHora, estadoFinal)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO registros_chatbot (registro, stage, celularChat, aceptoPolitica, nombreApellido, celular, ciudad, cargo, detalleCargo, respuestaFiltro1, respuestaFiltro2, respuestaFiltro3, direccion, fechaHora, estadoFinal, fechaHoraInicial)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
         const fechaRegistro = new Date().toLocaleString("en-CA", {
@@ -877,7 +902,8 @@ async function guardarEnBaseDeDatos(userData, from) {
             userData.data.respuestaFiltro3 ?? "-",
             (userData.data.direccion?.join(', ') ?? "-"), // Asegura que dirección sea un string
             userData.data.fechaHora ?? "-",
-            estadoFinal
+            estadoFinal,
+            userData.data.fechaHora ?? "-"
         ];
 
         await connection.execute(sql, valores);
