@@ -870,8 +870,9 @@ async function guardarEnBaseDeDatos(userData, from) {
         `;
 
         const fechaRegistro = new Date().toLocaleString("en-CA", {
-            timeZone: "America/Bogota"
-        }).replace("T", " ");
+            timeZone: "America/Bogota",
+            hour12: false 
+        }).replace(",", "");
 
         let estadoFinal
 
