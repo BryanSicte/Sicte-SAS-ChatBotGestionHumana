@@ -864,19 +864,19 @@ async function guardarEnBaseDeDatos(userData, from) {
 
         const valores = [
             fechaRegistro,
-            userData.stage ?? null,
-            userData.data.aceptoDatos === 'Acepto' ? from : null,
-            userData.data.aceptoDatos ?? null,
-            userData.data.nombreApellido ?? null,
-            userData.data.celular ?? null,
-            userData.data.ciudad ?? null,
-            userData.data.cargo ?? null,
-            userData.data.detalleCargo ?? null,
-            userData.data.respuestaFiltro1 ?? null,
-            userData.data.respuestaFiltro2 ?? null,
-            userData.data.respuestaFiltro3 ?? null,
-            (userData.data.direccion?.join(', ') ?? null), // Asegura que dirección sea un string
-            userData.data.fechaHora ?? null,
+            userData.stage ?? "-",
+            userData.data.aceptoDatos === 'Acepto' ? from : "-",
+            userData.data.aceptoDatos ?? "-",
+            userData.data.nombreApellido ?? "-",
+            userData.data.celular ?? "-",
+            userData.data.ciudad ?? "-",
+            userData.data.cargo ?? "-",
+            userData.data.detalleCargo ?? "-",
+            userData.data.respuestaFiltro1 ?? "-",
+            userData.data.respuestaFiltro2 ?? "-",
+            userData.data.respuestaFiltro3 ?? "-",
+            (userData.data.direccion?.join(', ') ?? "-"), // Asegura que dirección sea un string
+            userData.data.fechaHora ?? "-",
             estadoFinal
         ];
 
