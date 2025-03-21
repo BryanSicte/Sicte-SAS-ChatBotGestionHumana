@@ -336,11 +336,15 @@ app.post("/webhook", async (req, res) => {
 
         } else if (userStates[from].stage === "esperando_cargo") {
 
-            const cargosUnicas = [...new Set(ciudadesCache.map(c => c.Cargo))].sort();
+            const cargosDisponibles = ciudadesCache
+                    .filter(c => c.Ciudad === userStates[from].data.ciudad)
+                    .map(c => c.Cargo);
+
+            const cargosUnicos = [...new Set(cargosDisponibles)].sort();
 
             const numeroIngresado = parseInt(text, 10);
-            if (numeroIngresado >= 1 && numeroIngresado <= cargosUnicas.length) {
-                const cargoSeleccionado = cargosUnicas[numeroIngresado - 1];
+            if (numeroIngresado >= 1 && numeroIngresado <= cargosUnicos.length) {
+                const cargoSeleccionado = cargosUnicos[numeroIngresado - 1];
 
                 userStates[from].data.cargo = cargoSeleccionado;
 
