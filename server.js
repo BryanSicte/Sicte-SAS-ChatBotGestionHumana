@@ -869,13 +869,13 @@ async function guardarEnBaseDeDatos(userData, from) {
         console.log(userData)
 
         const sql = `
-            INSERT INTO registros_chatbot (registro, stage, celularChat, aceptoPolitica, nombreApellido, celular, ciudad, cargo, detalleCargo, respuestaFiltro1, respuestaFiltro2, respuestaFiltro3, direccion, fechaHora, estadoFinal, fechaHoraInicial)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            INSERT INTO registros_chatbot (registro, fuente, stage, celularChat, aceptoPolitica, nombreApellido, celular, ciudad, cargo, detalleCargo, respuestaFiltro1, respuestaFiltro2, respuestaFiltro3, direccion, fechaHora, estadoFinal, fechaHoraInicial)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
         `;
 
         const fechaRegistro = new Date().toLocaleString("en-CA", {
             timeZone: "America/Bogota",
-            hour12: false 
+            hour12: false
         }).replace(",", "");
 
         let estadoFinal
@@ -894,6 +894,7 @@ async function guardarEnBaseDeDatos(userData, from) {
 
         const valores = [
             fechaRegistro,
+            "Chatbot",
             userData.stage ?? "-",
             userData.data.aceptoDatos === 'Acepto' ? from : "-",
             userData.data.aceptoDatos ?? "-",
