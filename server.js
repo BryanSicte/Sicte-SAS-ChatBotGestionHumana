@@ -167,19 +167,32 @@ app.post("/webhook", async (req, res) => {
 
             const ahora = new Date().toLocaleString("en-US", { timeZone: "America/Bogota" });
             const horaActual = new Date(ahora).getHours();
+            let opciones;
 
-            let opciones = [
-                `➊ ${fechaMañana} a las 8:30 am.`,
-                `➋ ${fechaMañana} a las 2:00 pm.`,
-                `➌ ${fechaPasadoMañana} a las 8:30 am.`,
-                `➍ ${fechaPasadoMañana} a las 2:00 pm.`,
-                `➎ No tengo disponibilidad para asistir.`
-            ];
+            if (userStates[from].data.ciudad === "Bogotá" || userStates[from].data.ciudad === "Zipaquirá y Sabana Norte") {
+                opciones = [
+                    `➊ ${fechaMañana} a las 8:30 am.`,
+                    `➋ ${fechaMañana} a las 2:00 pm.`,
+                    `➌ ${fechaPasadoMañana} a las 8:30 am.`,
+                    `➍ ${fechaPasadoMañana} a las 2:00 pm.`,
+                    `➎ No tengo disponibilidad para asistir.`
+                ];
 
-            console.log(horaActual)
-
-            if (horaActual >= 16) {
-                opciones.shift(); // Elimina la primera opción (8:30 am de mañana)
+                if (horaActual >= 16) {
+                    opciones.shift(); // Elimina la primera opción (8:30 am de mañana)
+                }
+            } else if (userStates[from].data.ciudad === "Pereira" || userStates[from].data.ciudad === "Armenia") {
+                opciones = [
+                    `➊ ${fechaMañana} a las 2:00 pm.`,
+                    `➋ ${fechaPasadoMañana} a las 2:00 pm.`,
+                    `➌ No tengo disponibilidad para asistir.`
+                ];
+            } else if (userStates[from].data.ciudad === "Manizales") {
+                opciones = [
+                    `➊ ${fechaMañana} a las 10:00 am.`,
+                    `➋ ${fechaPasadoMañana} a las 10:00 am.`,
+                    `➌ No tengo disponibilidad para asistir.`
+                ];
             }
 
             const userInfo = `
@@ -337,8 +350,8 @@ app.post("/webhook", async (req, res) => {
         } else if (userStates[from].stage === "esperando_cargo") {
 
             const cargosDisponibles = ciudadesCache
-                    .filter(c => c.Ciudad === userStates[from].data.ciudad)
-                    .map(c => c.Cargo);
+                .filter(c => c.Ciudad === userStates[from].data.ciudad)
+                .map(c => c.Cargo);
 
             const cargosUnicos = [...new Set(cargosDisponibles)].sort();
 
@@ -615,16 +628,33 @@ app.post("/webhook", async (req, res) => {
             const horaActual = new Date(ahora).getHours();
 
             const numeroIngresado = parseInt(text, 10);
-            if ((numeroIngresado === 1 && horaActual < 16) || (numeroIngresado >= 2 && numeroIngresado <= 4)) {
+            if ((numeroIngresado === 1 && horaActual < 16 && (userStates[from].data.Ciudad === "Bogotá" || userStates[from].data.Ciudad === "Zipaquirá y Sabana Norte")) ||
+                (numeroIngresado >= 2 && numeroIngresado <= 4 && (userStates[from].data.Ciudad === "Bogotá" || userStates[from].data.Ciudad === "Zipaquirá y Sabana Norte")) ||
+                (numeroIngresado >= 1 && numeroIngresado <= 2 && (userStates[from].data.Ciudad === "Pereira" || userStates[from].data.Ciudad === "Armenia")) ||
+                (numeroIngresado >= 1 && numeroIngresado <= 2 && userStates[from].data.Ciudad === "Manizales")) {
 
-                if (numeroIngresado === 1) {
-                    userStates[from].data.fechaHora = `${fechaMañana} a las 8:30 am`;
-                } else if (numeroIngresado === 2) {
-                    userStates[from].data.fechaHora = `${fechaMañana} a las 2:00 pm`;
-                } else if (numeroIngresado === 3) {
-                    userStates[from].data.fechaHora = `${fechaPasadoMañana} a las 8:30 am`;
-                } else if (numeroIngresado === 4) {
-                    userStates[from].data.fechaHora = `${fechaPasadoMañana} a las 2:00 pm`;
+                if (userStates[from].data.Ciudad === "Bogotá" || userStates[from].data.Ciudad === "Zipaquirá y Sabana Norte") {
+                    if (numeroIngresado === 1) {
+                        userStates[from].data.fechaHora = `${fechaMañana} a las 8:30 am`;
+                    } else if (numeroIngresado === 2) {
+                        userStates[from].data.fechaHora = `${fechaMañana} a las 2:00 pm`;
+                    } else if (numeroIngresado === 3) {
+                        userStates[from].data.fechaHora = `${fechaPasadoMañana} a las 8:30 am`;
+                    } else if (numeroIngresado === 4) {
+                        userStates[from].data.fechaHora = `${fechaPasadoMañana} a las 2:00 pm`;
+                    }
+                } else if (userStates[from].data.Ciudad === "Pereira" || userStates[from].data.Ciudad === "Armenia") {
+                    if (numeroIngresado === 1) {
+                        userStates[from].data.fechaHora = `${fechaMañana} a las 2:00 pm`;
+                    } else if (numeroIngresado === 2) {
+                        userStates[from].data.fechaHora = `${fechaPasadoMañana} a las 2:00 pm`;
+                    }
+                } else if (userStates[from].data.Ciudad === "Manizales") {
+                    if (numeroIngresado === 1) {
+                        userStates[from].data.fechaHora = `${fechaMañana} a las 10:00 am`;
+                    } else if (numeroIngresado === 2) {
+                        userStates[from].data.fechaHora = `${fechaPasadoMañana} a las 10:00 am`;
+                    }
                 }
 
                 let textoAdicional;
@@ -662,7 +692,9 @@ app.post("/webhook", async (req, res) => {
 
                 delete userStates[from];
 
-            } else if (numeroIngresado === 5) {
+            } else if ((numeroIngresado === 5 && (userStates[from].data.Ciudad === "Bogotá" || userStates[from].data.Ciudad === "Zipaquirá y Sabana Norte")) ||
+                (numeroIngresado === 3 && (userStates[from].data.Ciudad === "Pereira" || userStates[from].data.Ciudad === "Armenia" || userStates[from].data.Ciudad === "Manizales"))) {
+
                 userStates[from].data.fechaHora = `No tengo disponibilidad para asistir`;
 
                 const PersonasDisponibles = ciudadesCache
