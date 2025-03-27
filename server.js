@@ -464,9 +464,17 @@ app.post("/webhook", async (req, res) => {
 
                 } else if (numeroIngresado === 2) {
                     userStates[from].data.respuestaFiltro1 = "No";
-                    userStates[from].data.respuestaFiltro2 = "No Aplica";
 
-                    preguntaFiltro3();
+                    let mensajeRechazo;
+                    mensajeRechazo = "No cumples con uno de los requisito para el cargo el cual es tener moto propia."
+
+                    userInfo = `
+                        🔹 ${mensajeRechazo}.
+                    `;
+
+                    await sendMessage(from, userInfo);
+
+                    preguntaMirarOtrosCargos();
                 } else {
                     await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indique 1 para Si o 2 para No.");
                 }

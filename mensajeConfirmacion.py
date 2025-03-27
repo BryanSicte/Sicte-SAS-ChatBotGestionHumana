@@ -73,7 +73,7 @@ for _, row in df_actualizar_posteriores.iterrows():
     response = requests.post(url, json=data, headers=headers)
 
     # Imprimir la respuesta
-    print(f"Enviando mensaje a {data}")
+    print(f"\nEnviando mensaje a {data}")
     print(f"Status Code: {response.status_code}")
     
     try:
@@ -81,14 +81,14 @@ for _, row in df_actualizar_posteriores.iterrows():
     except:
         print("Error en la respuesta:", response.text)  # Mostrar texto si no es JSON
 
-    # conexion = pyodbc.connect('DSN=CCOT Ferias;UID=BryanUtria;PWD=Bry@n.98#;DATABASE=gestion_humana;CHARSET=utf8mb4')
-    # cursor = conexion.cursor()
-    # query = f"""
-    # UPDATE registros_chatbot 
-    # SET estadoFinal = 'Finalizado' 
-    # WHERE id = ?
-    # """
-    # cursor.execute(query, (row['id'],))
-    # conexion.commit()
-    # cursor.close()
-    # conexion.close()
+    conexion = pyodbc.connect('DSN=CCOT Ferias;UID=BryanUtria;PWD=Bry@n.98#;DATABASE=gestion_humana;CHARSET=utf8mb4')
+    cursor = conexion.cursor()
+    query = f"""
+    UPDATE registros_chatbot 
+    SET estadoFinal = 'Finalizado' 
+    WHERE id = ?
+    """
+    cursor.execute(query, (row['id'],))
+    conexion.commit()
+    cursor.close()
+    conexion.close()
