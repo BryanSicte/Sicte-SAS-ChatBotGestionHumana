@@ -29,6 +29,9 @@ async function obtenerCiudades() {
         console.log("✅ Conexión exitosa a MySQL");
 
         const [rows] = await connection.execute("select * from ciudad_cargos");
+
+        console.log(rows);
+        
         const ciudadesFiltradas = rows.filter(c => c.estado === "true");
 
 
