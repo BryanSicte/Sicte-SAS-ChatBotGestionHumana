@@ -30,10 +30,9 @@ async function obtenerCiudades() {
 
         const [rows] = await connection.execute("select * from ciudad_cargos");
 
-        console.log(rows);
-        
         const ciudadesFiltradas = rows.filter(c => c.estado === "true");
 
+        console.log(ciudadesFiltradas);
 
         ciudadesCache = ciudadesFiltradas;
         return ciudadesCache;
