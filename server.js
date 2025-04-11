@@ -32,8 +32,6 @@ async function obtenerCiudades() {
 
         const ciudadesFiltradas = rows.filter(c => c.estado === "true");
 
-        console.log(ciudadesFiltradas);
-
         ciudadesCache = ciudadesFiltradas;
         return ciudadesCache;
 
@@ -118,8 +116,8 @@ app.post("/webhook", async (req, res) => {
             await sendMessage(from, userInfo1);
 
             const cargosDisponibles = ciudadesCache
-                .filter(c => c.Ciudad === userStates[from].data.ciudad)
-                .map(c => c.Cargo);
+                .filter(c => c.ciudad === userStates[from].data.ciudad)
+                .map(c => c.cargo);
 
             const cargosUnicos = [...new Set(cargosDisponibles)].sort();
 
@@ -159,8 +157,8 @@ app.post("/webhook", async (req, res) => {
             let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
 
             const direcciones = ciudadesCache
-                .filter(c => c.Ciudad === userStates[from].data.ciudad)
-                .map(c => c.Direccion);
+                .filter(c => c.ciudad === userStates[from].data.ciudad)
+                .map(c => c.direccion);
 
             const direccion = [...new Set(direcciones)].sort();
 
@@ -284,7 +282,7 @@ app.post("/webhook", async (req, res) => {
         } else if (userStates[from].stage === "esperando_celular") {
             const ciudades = await obtenerCiudades();
 
-            const ciudadesUnicas = [...new Set(ciudades.map(c => c.Ciudad))].sort();
+            const ciudadesUnicas = [...new Set(ciudades.map(c => c.ciudad))].sort();
 
             const numerosIconos = ["➊", "➋", "➌", "➍", "➎", "➏", "➐", "➑", "➒", "➓"];
             const opcionesCiudades = ciudadesUnicas
@@ -309,15 +307,15 @@ app.post("/webhook", async (req, res) => {
             }
         } else if (userStates[from].stage === "esperando_ciudad") {
 
-            const ciudadesUnicas = [...new Set(ciudadesCache.map(c => c.Ciudad))].sort();
+            const ciudadesUnicas = [...new Set(ciudadesCache.map(c => c.ciudad))].sort();
 
             const numeroIngresado = parseInt(text, 10);
             if (numeroIngresado >= 1 && numeroIngresado <= ciudadesUnicas.length) {
                 const ciudadSeleccionada = ciudadesUnicas[numeroIngresado - 1];
 
                 const cargosDisponibles = ciudadesCache
-                    .filter(c => c.Ciudad === ciudadSeleccionada)
-                    .map(c => c.Cargo);
+                    .filter(c => c.ciudad === ciudadSeleccionada)
+                    .map(c => c.cargo);
 
                 const cargosUnicos = [...new Set(cargosDisponibles)].sort();
 
@@ -327,8 +325,8 @@ app.post("/webhook", async (req, res) => {
                     .join("");
 
                 const PersonasDisponibles = ciudadesCache
-                    .filter(c => c.Ciudad === ciudadSeleccionada)
-                    .map(c => c.Nombre);
+                    .filter(c => c.ciudad === ciudadSeleccionada)
+                    .map(c => c.nombre);
 
                 const personasUnicas = [...new Set(PersonasDisponibles)].sort();
 
@@ -352,8 +350,8 @@ app.post("/webhook", async (req, res) => {
         } else if (userStates[from].stage === "esperando_cargo") {
 
             const cargosDisponibles = ciudadesCache
-                .filter(c => c.Ciudad === userStates[from].data.ciudad)
-                .map(c => c.Cargo);
+                .filter(c => c.ciudad === userStates[from].data.ciudad)
+                .map(c => c.cargo);
 
             const cargosUnicos = [...new Set(cargosDisponibles)].sort();
 
@@ -678,14 +676,14 @@ app.post("/webhook", async (req, res) => {
                 }
 
                 const PersonasDisponibles = ciudadesCache
-                    .filter(c => c.Ciudad === userStates[from].data.ciudad)
-                    .map(c => c.Nombre);
+                    .filter(c => c.ciudad === userStates[from].data.ciudad)
+                    .map(c => c.nombre);
 
                 const personasUnicas = [...new Set(PersonasDisponibles)].sort();
 
                 const NumerosDisponibles = ciudadesCache
-                    .filter(c => c.Ciudad === userStates[from].data.ciudad)
-                    .map(c => c.Celular);
+                    .filter(c => c.ciudad === userStates[from].data.ciudad)
+                    .map(c => c.celular);
 
                 const numerosUnicos = [...new Set(NumerosDisponibles)].sort();
 
@@ -710,14 +708,14 @@ app.post("/webhook", async (req, res) => {
                 userStates[from].data.fechaHora = `No tengo disponibilidad para asistir`;
 
                 const PersonasDisponibles = ciudadesCache
-                    .filter(c => c.Ciudad === userStates[from].data.ciudad)
-                    .map(c => c.Nombre);
+                    .filter(c => c.ciudad === userStates[from].data.ciudad)
+                    .map(c => c.nombre);
 
                 const personasUnicas = [...new Set(PersonasDisponibles)].sort();
 
                 const NumerosDisponibles = ciudadesCache
-                    .filter(c => c.Ciudad === userStates[from].data.ciudad)
-                    .map(c => c.Celular);
+                    .filter(c => c.ciudad === userStates[from].data.ciudad)
+                    .map(c => c.celular);
 
                 const numerosUnicos = [...new Set(NumerosDisponibles)].sort();
 
