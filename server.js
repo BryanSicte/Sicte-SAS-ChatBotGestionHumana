@@ -770,7 +770,7 @@ const enviarMensajeTratamientoDeDatos = async (to) => {
                 interactive: {
                     type: "button",
                     body: {
-                        text: "¡Hola! Te damos la bienvenida a Sicte SAS, una empresa líder en telecomunicaciones, te encuentras en contacto con Esteban Morales del equipo de Gestión Humana.\n📜 Antes de iniciar y en cumplimiento de la Ley 1581 de 2012 y el Decreto 1377 de 2013, te informo que el tratamiento de tus datos personales se realizará conforme a nuestra política de privacidad que puedes consultar en: https://sicte.com/imagenes/certificados/politicadedatos.pdf.\n\n✅ ¿Aceptas estos términos?"
+                        text: "¡Hola! Te damos la bienvenida a Sicte SAS, una empresa líder en telecomunicaciones, te encuentras en contacto con David Turriago del equipo de Gestión Humana.\n📜 Antes de iniciar y en cumplimiento de la Ley 1581 de 2012 y el Decreto 1377 de 2013, te informo que el tratamiento de tus datos personales se realizará conforme a nuestra política de privacidad que puedes consultar en: https://sicte.com/imagenes/certificados/politicadedatos.pdf.\n\n✅ ¿Aceptas estos términos?"
                     },
                     action: {
                         buttons: [
