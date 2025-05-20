@@ -77,6 +77,14 @@ app.post("/webhook", async (req, res) => {
             return nuevoDia;
         }
 
+        function obtenerProximoSabado(fechaBase) {
+            const fecha = new Date(fechaBase);
+            const diaActual = fecha.getDay(); // 0=Domingo, 6=Sábado
+            const diasParaSabado = (6 - diaActual + 7) % 7 || 7; // Garantiza que siempre sea el próximo sábado
+            fecha.setDate(fecha.getDate() + diasParaSabado);
+            return fecha;
+        }
+
         async function salirDeLaConversacion() {
             console.log("Datos almacenados en userStates:", userStates[from]);
 
@@ -167,9 +175,28 @@ app.post("/webhook", async (req, res) => {
 
             const ahora = new Date().toLocaleString("en-US", { timeZone: "America/Bogota" });
             const horaActual = new Date(ahora).getHours();
+            const diaSemana = new Date(ahora).getDay();
             let opciones;
 
-            if (userStates[from].data.ciudad === "Bogotá" || userStates[from].data.ciudad === "Zipaquirá y Sabana Norte") {
+            if (userStates[from].data.ciudad === "Bogotá") {
+                opciones = [
+                    `➊ ${fechaMañana} a las 8:30 am.`,
+                    `➋ ${fechaMañana} a las 2:00 pm.`,
+                    `➌ ${fechaPasadoMañana} a las 8:30 am.`,
+                    `➍ ${fechaPasadoMañana} a las 2:00 pm.`,
+                ];
+
+                if (diaSemana === 4 || diaSemana === 5) {
+                    opciones.push(`➎ ${fechaProximoSabado} a las 8:30 am.`);
+                    opciones.push(`➏ No tengo disponibilidad para asistir.`);
+                } else {
+                    opciones.push(`➎ No tengo disponibilidad para asistir.`);
+                }
+
+                if (horaActual >= 16) {
+                    opciones.shift(); // Elimina la primera opción (8:30 am de mañana)
+                }
+            } else if (userStates[from].data.ciudad === "Zipaquirá y Sabana Norte") {
                 opciones = [
                     `➊ ${fechaMañana} a las 8:30 am.`,
                     `➋ ${fechaMañana} a las 2:00 pm.`,
@@ -228,10 +255,12 @@ app.post("/webhook", async (req, res) => {
         let hoy = new Date();
         let diaMañana = obtenerDiaHabil(hoy, 1);
         let diaPasadoMañana = obtenerDiaHabil(diaMañana, 1);
+        let proximoSabado = obtenerProximoSabado(hoy);
 
         let opcionesFecha = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
         let fechaMañana = diaMañana.toLocaleDateString('es-ES', opcionesFecha);
         let fechaPasadoMañana = diaPasadoMañana.toLocaleDateString('es-ES', opcionesFecha);
+        let fechaProximoSabado = proximoSabado.toLocaleDateString('es-ES', opcionesFecha);
 
         if (!userStates[from]) {
             userStates[from] = { stage: "esperando_tratamientoDeDatos", data: {} };
@@ -374,6 +403,7 @@ app.post("/webhook", async (req, res) => {
                 if (cargoSeleccionado === "Motorizados") {
                     detalleCargo = `🔹 ${nombreFormateado}, en este momento buscamos personas con motocicleta para realizar instalaciones de internet, televisión y telefonía en la ciudad ${userStates[from].data.ciudad}.
                         \n¡NO SE REQUIERE EXPERIENCIA NOSOTROS TE CAPACITAMOS!
+                        \n*Requisitos del vehículo:*\n• Cilindraje de 125cc en adelante.\n• No debe ser tipo scooter.\n• Modelo 2016 en adelante.
                         \n¿Qué te ofrecemos?
                         \n• Salario: $1.423.500 + $500.000 rodamiento + $200.000 auxilio de transporte + ¡Excelente! tabla de bonificaciones y todas las prestaciones de ley.\n• Contrato a término indefinido.\n• Plan carrera.\n•	Capacitación paga.\n• Se realiza curso de alturas una vez se firme contrato laboral.\n•	Horario: Lunes a sábado con disponibilidad de laborar 2 domingos.
                     `
@@ -634,16 +664,30 @@ app.post("/webhook", async (req, res) => {
 
             const ahora = new Date().toLocaleString("en-US", { timeZone: "America/Bogota" });
             const horaActual = new Date(ahora).getHours();
+            const diaSemana = new Date(ahora).getDay();
 
             const ciudad = userStates[from].data.ciudad;
             const numeroIngresado = parseInt(text, 10);
 
-            if ((numeroIngresado === 1 && horaActual < 16 && (ciudad === "Bogotá" || ciudad === "Zipaquirá y Sabana Norte")) ||
+            if ((numeroIngresado === 5 && (diaSemana === 4 || diaSemana === 5) && ciudad === "Bogotá") ||
+                (numeroIngresado === 1 && horaActual < 16 && (ciudad === "Bogotá" || ciudad === "Zipaquirá y Sabana Norte")) ||
                 (numeroIngresado >= 2 && numeroIngresado <= 4 && (ciudad === "Bogotá" || ciudad === "Zipaquirá y Sabana Norte")) ||
                 (numeroIngresado >= 1 && numeroIngresado <= 2 && (ciudad === "Pereira" || ciudad === "Armenia")) ||
                 (numeroIngresado >= 1 && numeroIngresado <= 2 && ciudad === "Manizales")) {
 
-                if (ciudad === "Bogotá" || ciudad === "Zipaquirá y Sabana Norte") {
+                if (ciudad === "Bogotá") {
+                    if (numeroIngresado === 1) {
+                        userStates[from].data.fechaHora = `${fechaMañana} a las 8:30 am`;
+                    } else if (numeroIngresado === 2) {
+                        userStates[from].data.fechaHora = `${fechaMañana} a las 2:00 pm`;
+                    } else if (numeroIngresado === 3) {
+                        userStates[from].data.fechaHora = `${fechaPasadoMañana} a las 8:30 am`;
+                    } else if (numeroIngresado === 4) {
+                        userStates[from].data.fechaHora = `${fechaPasadoMañana} a las 2:00 pm`;
+                    } else if (numeroIngresado === 5) {
+                        userStates[from].data.fechaHora = `${fechaProximoSabado} a las 8:30 am`;
+                    }
+                } else if (ciudad === "Zipaquirá y Sabana Norte") {
                     if (numeroIngresado === 1) {
                         userStates[from].data.fechaHora = `${fechaMañana} a las 8:30 am`;
                     } else if (numeroIngresado === 2) {
@@ -702,7 +746,8 @@ app.post("/webhook", async (req, res) => {
 
                 delete userStates[from];
 
-            } else if ((numeroIngresado === 5 && (userStates[from].data.Ciudad === "Bogotá" || userStates[from].data.Ciudad === "Zipaquirá y Sabana Norte")) ||
+            } else if ((numeroIngresado === 5 && (diaSemana !== 4 && diaSemana !== 5) && userStates[from].data.Ciudad === "Bogotá") ||
+                (numeroIngresado === 5 && userStates[from].data.Ciudad === "Zipaquirá y Sabana Norte") ||
                 (numeroIngresado === 3 && (userStates[from].data.Ciudad === "Pereira" || userStates[from].data.Ciudad === "Armenia" || userStates[from].data.Ciudad === "Manizales"))) {
 
                 userStates[from].data.fechaHora = `No tengo disponibilidad para asistir`;
