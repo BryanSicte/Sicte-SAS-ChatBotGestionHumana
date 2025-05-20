@@ -186,8 +186,8 @@ app.post("/webhook", async (req, res) => {
                     `➍ ${fechaPasadoMañana} a las 2:00 pm.`,
                 ];
 
-                if (diaSemana === 4 || diaSemana === 5) {
-                    opciones.push(`➎ ${fechaProximoSabado} a las 8:30 am.`);
+                if (diaSemana === 4 || (diaSemana === 5 && horaActual < 16)) {
+                    opciones.push(`➎ ${fechaProximoSabado} a las 8:00 am.`);
                     opciones.push(`➏ No tengo disponibilidad para asistir.`);
                 } else {
                     opciones.push(`➎ No tengo disponibilidad para asistir.`);
@@ -669,7 +669,7 @@ app.post("/webhook", async (req, res) => {
             const ciudad = userStates[from].data.ciudad;
             const numeroIngresado = parseInt(text, 10);
 
-            if ((numeroIngresado === 5 && (diaSemana === 4 || diaSemana === 5) && ciudad === "Bogotá") ||
+            if ((numeroIngresado === 5 && (diaSemana === 4 || (diaSemana === 5 && horaActual < 16)) && ciudad === "Bogotá") ||
                 (numeroIngresado === 1 && horaActual < 16 && (ciudad === "Bogotá" || ciudad === "Zipaquirá y Sabana Norte")) ||
                 (numeroIngresado >= 2 && numeroIngresado <= 4 && (ciudad === "Bogotá" || ciudad === "Zipaquirá y Sabana Norte")) ||
                 (numeroIngresado >= 1 && numeroIngresado <= 2 && (ciudad === "Pereira" || ciudad === "Armenia")) ||
@@ -685,7 +685,7 @@ app.post("/webhook", async (req, res) => {
                     } else if (numeroIngresado === 4) {
                         userStates[from].data.fechaHora = `${fechaPasadoMañana} a las 2:00 pm`;
                     } else if (numeroIngresado === 5) {
-                        userStates[from].data.fechaHora = `${fechaProximoSabado} a las 8:30 am`;
+                        userStates[from].data.fechaHora = `${fechaProximoSabado} a las 8:00 am`;
                     }
                 } else if (ciudad === "Zipaquirá y Sabana Norte") {
                     if (numeroIngresado === 1) {
@@ -746,7 +746,7 @@ app.post("/webhook", async (req, res) => {
 
                 delete userStates[from];
 
-            } else if ((numeroIngresado === 5 && (diaSemana !== 4 && diaSemana !== 5) && userStates[from].data.Ciudad === "Bogotá") ||
+            } else if (((numeroIngresado === 5 || (numeroIngresado === 6 && (diaSemana === 4 || diaSemana === 5))) && userStates[from].data.Ciudad === "Bogotá") ||
                 (numeroIngresado === 5 && userStates[from].data.Ciudad === "Zipaquirá y Sabana Norte") ||
                 (numeroIngresado === 3 && (userStates[from].data.Ciudad === "Pereira" || userStates[from].data.Ciudad === "Armenia" || userStates[from].data.Ciudad === "Manizales"))) {
 
