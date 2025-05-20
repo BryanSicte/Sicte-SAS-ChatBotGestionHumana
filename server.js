@@ -746,9 +746,9 @@ app.post("/webhook", async (req, res) => {
 
                 delete userStates[from];
 
-            } else if (((numeroIngresado === 5 || (numeroIngresado === 6 && (diaSemana === 4 || diaSemana === 5))) && userStates[from].data.Ciudad === "Bogotá") ||
-                (numeroIngresado === 5 && userStates[from].data.Ciudad === "Zipaquirá y Sabana Norte") ||
-                (numeroIngresado === 3 && (userStates[from].data.Ciudad === "Pereira" || userStates[from].data.Ciudad === "Armenia" || userStates[from].data.Ciudad === "Manizales"))) {
+            } else if (((numeroIngresado === 5 || (numeroIngresado === 6 && (diaSemana === 4 || diaSemana === 5))) && userStates[from].data.ciudad === "Bogotá") ||
+                (numeroIngresado === 5 && userStates[from].data.ciudad === "Zipaquirá y Sabana Norte") ||
+                (numeroIngresado === 3 && (userStates[from].data.ciudad === "Pereira" || userStates[from].data.ciudad === "Armenia" || userStates[from].data.ciudad === "Manizales"))) {
 
                 userStates[from].data.fechaHora = `No tengo disponibilidad para asistir`;
 
