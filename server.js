@@ -208,13 +208,13 @@ app.post("/webhook", async (req, res) => {
                 if (horaActual >= 16) {
                     opciones.shift(); // Elimina la primera opción (8:30 am de mañana)
                 }
-            } else if (userStates[from].data.ciudad === "Pereira" || userStates[from].data.ciudad === "Armenia") {
+            } else if (userStates[from].data.ciudad === "Armenia") {
                 opciones = [
                     `➊ ${fechaMañana} a las 2:00 pm.`,
                     `➋ ${fechaPasadoMañana} a las 2:00 pm.`,
                     `➌ No tengo disponibilidad para asistir.`
                 ];
-            } else if (userStates[from].data.ciudad === "Manizales") {
+            } else if (userStates[from].data.ciudad === "Pereira" || userStates[from].data.ciudad === "Manizales") {
                 opciones = [
                     `➊ ${fechaMañana} a las 10:00 am.`,
                     `➋ ${fechaPasadoMañana} a las 10:00 am.`,
@@ -672,8 +672,8 @@ app.post("/webhook", async (req, res) => {
             if ((numeroIngresado === 5 && (diaSemana === 4 || (diaSemana === 5 && horaActual < 16)) && ciudad === "Bogotá") ||
                 (numeroIngresado === 1 && horaActual < 16 && (ciudad === "Bogotá" || ciudad === "Zipaquirá y Sabana Norte")) ||
                 (numeroIngresado >= 2 && numeroIngresado <= 4 && (ciudad === "Bogotá" || ciudad === "Zipaquirá y Sabana Norte")) ||
-                (numeroIngresado >= 1 && numeroIngresado <= 2 && (ciudad === "Pereira" || ciudad === "Armenia")) ||
-                (numeroIngresado >= 1 && numeroIngresado <= 2 && ciudad === "Manizales")) {
+                (numeroIngresado >= 1 && numeroIngresado <= 2 && (ciudad === "Armenia")) ||
+                (numeroIngresado >= 1 && numeroIngresado <= 2 && (ciudad === "Pereira" || ciudad === "Manizales"))) {
 
                 if (ciudad === "Bogotá") {
                     if (numeroIngresado === 1) {
@@ -697,13 +697,13 @@ app.post("/webhook", async (req, res) => {
                     } else if (numeroIngresado === 4) {
                         userStates[from].data.fechaHora = `${fechaPasadoMañana} a las 2:00 pm`;
                     }
-                } else if (ciudad === "Pereira" || ciudad === "Armenia") {
+                } else if (ciudad === "Armenia") {
                     if (numeroIngresado === 1) {
                         userStates[from].data.fechaHora = `${fechaMañana} a las 2:00 pm`;
                     } else if (numeroIngresado === 2) {
                         userStates[from].data.fechaHora = `${fechaPasadoMañana} a las 2:00 pm`;
                     }
-                } else if (ciudad === "Manizales") {
+                } else if (ciudad === "Pereira" || ciudad === "Manizales") {
                     if (numeroIngresado === 1) {
                         userStates[from].data.fechaHora = `${fechaMañana} a las 10:00 am`;
                     } else if (numeroIngresado === 2) {
