@@ -97,7 +97,8 @@ app.post("/webhook", async (req, res) => {
                 let nombre = userStates[from].data.nombreApellido.split(" ")[0];
                 let nombreFormateado = nombre.charAt(0).toUpperCase() + nombre.slice(1).toLowerCase();
 
-                await sendMessage(from, `🔹 ${nombreFormateado}, gracias por comunicarte con nosotros, en Sicte SAS. Recuerda que puedes revisar nuestra lista de ofertas en cualquier momento. ¡Estamos aquí para ayudarte!`);
+                await sendMessage(from, `🔹 ${nombreFormateado}, gracias por comunicarte con nosotros, en Sicte SAS. Recuerda que puedes revisar nuestra lista de ofertas en cualquier momento. ¡Estamos aquí para ayudarte!
+                    \nPara mantenerte informado de nuestras ofertas laborales síguenos en nuestro canal de WhatsApp: https://whatsapp.com/channel/0029VbAzYTLFMqrUNzwotM0l.`);
             }
 
             if (userStates[from].stage !== 'Completado') {
