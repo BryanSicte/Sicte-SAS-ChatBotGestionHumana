@@ -90,7 +90,8 @@ app.post("/webhook", async (req, res) => {
 
             if (userStates[from].stage === 'esperando_tratamientoDeDatos') {
 
-                await sendMessage(from, `🔹 Gracias por comunicarte con nosotros, en Sicte SAS. Recuerda que puedes revisar nuestra lista de ofertas en cualquier momento. ¡Estamos aquí para ayudarte!`);
+                await sendMessage(from, `🔹 Gracias por comunicarte con nosotros, en Sicte SAS. Recuerda que puedes revisar nuestra lista de ofertas en cualquier momento. ¡Estamos aquí para ayudarte!
+                    \nPara mantenerte informado de nuestras ofertas laborales síguenos en nuestro canal de WhatsApp: https://whatsapp.com/channel/0029VbAzYTLFMqrUNzwotM0l.`);
             } else {
 
                 let nombre = userStates[from].data.nombreApellido.split(" ")[0];
@@ -735,6 +736,7 @@ app.post("/webhook", async (req, res) => {
                 🔹 ${nombreFormateado}, gracias por confirmar tu asistencia, recuerda que mi nombre es ${personasUnicas} y te espero el día ${userStates[from].data.fechaHora} en la dirección ${userStates[from].data.direccion} de la ciudad ${userStates[from].data.ciudad}.
                 \nPor favor no olvides traer los siguientes documentos:
                 \n1. Hoja de vida actualizada\n2. Fotocopia de la cedula al 150%\n${textoAdicional}
+                \nPara mantenerte informado de nuestras ofertas laborales síguenos en nuestro canal de WhatsApp: https://whatsapp.com/channel/0029VbAzYTLFMqrUNzwotM0l.
                 \nSi tienes alguna inquietud puedes contactarme al número de teléfono ${numerosUnicos}\n👋 Ten un excelente dia.
                 `;
 
@@ -766,6 +768,7 @@ app.post("/webhook", async (req, res) => {
 
                 const userInfo = `
                 🔹 ${nombreFormateado}, gracias por comunicarte con nosotros, mi nombre es ${personasUnicas} y me estare comunicando contigo para validar tu disponibilidad. Recuerda que si tienes alguna inquietud puedes contactarme al numero ${numerosUnicos}.
+                \nPara mantenerte informado de nuestras ofertas laborales síguenos en nuestro canal de WhatsApp: https://whatsapp.com/channel/0029VbAzYTLFMqrUNzwotM0l.
                 `;
 
                 await sendMessage(from, userInfo);
@@ -934,7 +937,8 @@ function restartUserTimer(user) {
     userTimers[user] = setTimeout(async () => {
         if (!userStates[user]) return;
 
-        const userInfo = `🕛 Tiempo de espera agotado para ${user}, Gracias por comunicarse con nosotros.`;
+        const userInfo = `🕛 Tiempo de espera agotado para ${user}, Gracias por comunicarse con nosotros.
+        \nPara mantenerte informado de nuestras ofertas laborales síguenos en nuestro canal de WhatsApp: https://whatsapp.com/channel/0029VbAzYTLFMqrUNzwotM0l.`;
         console.log(userInfo);
         await sendMessage(user, userInfo);
 
