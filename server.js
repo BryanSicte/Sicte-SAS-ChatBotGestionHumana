@@ -392,9 +392,9 @@ app.post("/webhook", async (req, res) => {
 
                 userStates[from].data.cargo = cargoSeleccionado;
 
-                if (userStates[from].data.cargo === "Ayudante (Sin Moto)" || userStates[from].data.cargo === "Aparejador"
-                    || userStates[from].data.cargo === "Líder Técnico Conductor" || userStates[from].data.cargo === "Operador de Equipo Hidráulico"
-                    || userStates[from].data.cargo === "Técnico Operativo"
+                if (userStates[from].data.cargo === "Ayudante (Sin Moto)" || userStates[from].data.cargo === "Aparejador (Electrico)"
+                    || userStates[from].data.cargo === "Líder Técnico Conductor (Electrico)" || userStates[from].data.cargo === "Operador de Equipo Hidráulico (Electrico)"
+                    || userStates[from].data.cargo === "Técnico Operativo (Electrico)"
                 ) {
                     userStates[from].stage = "esperando_detalleCargo";
                 } else if (userStates[from].data.cargo === "Conductor" || userStates[from].data.cargo === "Motorizados") {
@@ -423,7 +423,7 @@ app.post("/webhook", async (req, res) => {
                         \n¿Qué te ofrecemos?
                         \n• Salario: $1.423.500 + $200.000 auxilio de transporte + ¡Excelente! tabla de bonificaciones y todas las prestaciones de ley.\n• Contrato a término indefinido.\n• Plan carrera.\n• Capacitación paga.\n•	Se realiza curso de alturas una vez se firme contrato laboral.\n• Horario: Lunes a sábado con disponibilidad de laborar 2 domingos.
                     `                    
-                } else if (cargoSeleccionado === "Aparejador") {
+                } else if (cargoSeleccionado === "Aparejador (Electrico)") {
                     detalleCargo = `🔹 ${nombreFormateado}, en este momento buscamos para la ciudad ${userStates[from].data.ciudad}.
                         \n🏗️ Vacante Laboral: Aparejador\n📍 Ubicación: Bogotá [Zona centro y sur]\n⏰ Jornada: Horarios rotativos.\n💰Salario: $2'000.000\n📢 ¡Únete a un equipo que construye con seguridad, precisión y compromiso!
                         \n🔧 ¿Qué harás como Aparejador?\nBuscamos un profesional comprometido y disciplinado que garantice la correcta ejecución de actividades de izaje, mantenimiento e instalación en redes eléctricas, cumpliendo estrictamente con los estándares de seguridad y calidad.
@@ -434,7 +434,7 @@ app.post("/webhook", async (req, res) => {
                         \n🏗️ Experiencia:\nMínimo 6 meses de experiencia en trabajos relacionados con sistemas de distribución eléctrica aérea y/o subterránea.
                         \n🧑‍🔧 ¿Por qué trabajar con nosotros?\n• Entorno seguro y profesional.\n• Formación y capacitación continua.\n• Oportunidades de desarrollo en el sector eléctrico.\n• Estabilidad laboral y beneficios extra legales
                     `
-                } else if (cargoSeleccionado === "Líder Técnico Conductor") {
+                } else if (cargoSeleccionado === "Líder Técnico Conductor (Electrico)") {
                     detalleCargo = `🔹 ${nombreFormateado}, en este momento buscamos para la ciudad ${userStates[from].data.ciudad}.
                         \n🚛 Vacante: Líder Técnico Conductor\n📍 Ubicación: Bogotá [Zona centro y Sur]\n✍🏻Tipo de contrato:Indefinido\n⏰ Horarios: Rotativos.\n💰Salario: S3'300.000.\n📣¡Sé parte de un equipo que ilumina ciudades con responsabilidad y liderazgo!
                         \n🔧 ¿Qué harás?\nComo Líder Técnico Conductor, serás responsable de: Conducir y operar vehículos y maquinaria hidráulica (canasta, grúa). Coordinar y ejecutar actividades de instalación, mantenimiento y reparación del sistema de alumbrado público (redes aéreas y subterráneas MT/BT/AP). Velar por el cumplimiento de normas de seguridad, correcta documentación de actividades y manejo eficiente de materiales. Garantizar el buen estado del vehículo, herramientas y elementos de protección personal (EPP). Transportar al equipo técnico y asegurar el cumplimiento de las rutas asignadas.
@@ -442,14 +442,14 @@ app.post("/webhook", async (req, res) => {
                         \n🧰Formación adicional:\n• Curso de alturas (trabajador autorizado o reentrenamiento)\n• Capacitación en sistema de gestión integral
                         \n🏗️ Experiencia:\n• 3 años en redes eléctricas MT/BT/AP\n• 1 año conduciendo vehículos.
                     `
-                } else if (cargoSeleccionado === "Operador de Equipo Hidráulico") {
+                } else if (cargoSeleccionado === "Operador de Equipo Hidráulico (Electrico)") {
                     detalleCargo = `🔹 ${nombreFormateado}, en este momento buscamos para la ciudad ${userStates[from].data.ciudad}.
                         \n🛠️ Vacante: Operador de Equipo Hidráulico\nUbicación: Bogotá [Zona centro y sur]\nTipo de contrato:Indefinido.\nHorario: Turnos rotativos\nSalario: $2'700.000
                         \n🚧 ¿Qué harás?\nOperarás equipos hidráulicos (elevadores tipo canasta, grúas, etc.) para instalación, mantenimiento y cambio de redes eléctricas MT/BT/AP y alumbrado público. Asegurarás el cumplimiento de normas de seguridad, manejo eficiente de materiales y registros técnicos, y transportarás personal y herramientas al sitio de trabajo.
                         \n✅ Requisitos\n• Formación: Técnico o tecnólogo en electricidad o afines.\n• Licencia y Matrícula: CONTE TE3 y TE5 vigentes.\n• Cursos: Alturas (nivel autorizado)\n• Operador de maquinaria hidráulica\n• Sistema de Gestión Integral
                         \nExperiencia:\n3 años en redes eléctricas MT/BT/AP\n2 años operando maquinaria hidráulica\n1 año conduciendo vehículos.
                     `
-                } else if (cargoSeleccionado === "Técnico Operativo") {
+                } else if (cargoSeleccionado === "Técnico Operativo (Electrico)") {
                     detalleCargo = `🔹 ${nombreFormateado}, en este momento buscamos para la ciudad ${userStates[from].data.ciudad}.
                         \n💡 Vacante: Técnico Operativo\nUbicación: Bogotá [Zona centro y sur]\nTipo de contrato: Indefinido\nHorarios: Rotativos\nSalario: $2'650.000\nÁrea: Alumbrado público – Redes eléctricas MT/BT/AP
                         \n🎯 Objetivo del Cargo\nGarantizar el funcionamiento eficiente del sistema de alumbrado público a través de labores de instalación, mantenimiento, inspección y reparación, cumpliendo con altos estándares de calidad, seguridad y tiempos establecidos.
@@ -670,9 +670,9 @@ app.post("/webhook", async (req, res) => {
                     await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indique un numero de 1 a 4.");
                 }
 
-            } else if (userStates[from].data.cargo === "Ayudante (Sin Moto)" || userStates[from].data.cargo === "Aparejador"
-                || userStates[from].data.cargo === "Líder Técnico Conductor" || userStates[from].data.cargo === "Operador de Equipo Hidráulico" 
-                || userStates[from].data.cargo === "Técnico Operativo"
+            } else if (userStates[from].data.cargo === "Ayudante (Sin Moto)" || userStates[from].data.cargo === "Aparejador (Electrico)"
+                || userStates[from].data.cargo === "Líder Técnico Conductor (Electrico)" || userStates[from].data.cargo === "Operador de Equipo Hidráulico (Electrico)" 
+                || userStates[from].data.cargo === "Técnico Operativo (Electrico)"
             ) {
 
                 const numeroIngresado = parseInt(text, 10);
