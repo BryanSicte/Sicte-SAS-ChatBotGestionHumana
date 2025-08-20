@@ -62,29 +62,6 @@ app.post("/webhook", async (req, res) => {
     if (message) {
         const hd = new Holidays('CO'); // Configura Colombia como país
 
-        function esFestivo(fecha) {
-            return hd.isHoliday(fecha) !== false; // Devuelve true si es festivo
-        }
-
-        function obtenerDiaHabil(hoy, diasSumar) {
-            let nuevoDia = new Date(hoy);
-            nuevoDia.setDate(hoy.getDate() + diasSumar);
-
-            while (nuevoDia.getDay() === 0 || nuevoDia.getDay() === 6 || esFestivo(nuevoDia)) {
-                nuevoDia.setDate(nuevoDia.getDate() + 1); // Avanza al siguiente día
-            }
-
-            return nuevoDia;
-        }
-
-        function obtenerProximoSabado(fechaBase) {
-            const fecha = new Date(fechaBase);
-            const diaActual = fecha.getDay(); // 0=Domingo, 6=Sábado
-            const diasParaSabado = (6 - diaActual + 7) % 7 || 7; // Garantiza que siempre sea el próximo sábado
-            fecha.setDate(fecha.getDate() + diasParaSabado);
-            return fecha;
-        }
-
         async function salirDeLaConversacion() {
             console.log("Datos almacenados en userStates:", userStates[from]);
 
@@ -247,6 +224,29 @@ app.post("/webhook", async (req, res) => {
             await sendMessage(from, userInfo);
         }
 
+        function esFestivo(fecha) {
+            return hd.isHoliday(fecha) !== false; // Devuelve true si es festivo
+        }
+
+        function obtenerDiaHabil(hoy, diasSumar) {
+            let nuevoDia = new Date(hoy);
+            nuevoDia.setDate(hoy.getDate() + diasSumar);
+
+            while (nuevoDia.getDay() === 0 || nuevoDia.getDay() === 6 || esFestivo(nuevoDia)) {
+                nuevoDia.setDate(nuevoDia.getDate() + 1); // Avanza al siguiente día
+            }
+
+            return nuevoDia;
+        }
+
+        function obtenerProximoSabado(fechaBase) {
+            const fecha = new Date(fechaBase);
+            const diaActual = fecha.getDay(); // 0=Domingo, 6=Sábado
+            const diasParaSabado = (6 - diaActual + 7) % 7 || 7; // Garantiza que siempre sea el próximo sábado
+            fecha.setDate(fecha.getDate() + diasParaSabado);
+            return fecha;
+        }
+
         const from = message.from;
         let text = message.text?.body || "Mensaje vacío";
 
@@ -392,7 +392,10 @@ app.post("/webhook", async (req, res) => {
 
                 userStates[from].data.cargo = cargoSeleccionado;
 
-                if (userStates[from].data.cargo === "Ayudante (Sin Moto)") {
+                if (userStates[from].data.cargo === "Ayudante (Sin Moto)" || userStates[from].data.cargo === "Aparejador"
+                    || userStates[from].data.cargo === "Líder Técnico Conductor" || userStates[from].data.cargo === "Operador de Equipo Hidráulico"
+                    || userStates[from].data.cargo === "Técnico Operativo"
+                ) {
                     userStates[from].stage = "esperando_detalleCargo";
                 } else if (userStates[from].data.cargo === "Conductor" || userStates[from].data.cargo === "Motorizados") {
                     userStates[from].stage = "esperando_filtro1";
@@ -419,6 +422,39 @@ app.post("/webhook", async (req, res) => {
                         \n¡NO SE REQUIERE EXPERIENCIA NOSOTROS TE CAPACITAMOS!
                         \n¿Qué te ofrecemos?
                         \n• Salario: $1.423.500 + $200.000 auxilio de transporte + ¡Excelente! tabla de bonificaciones y todas las prestaciones de ley.\n• Contrato a término indefinido.\n• Plan carrera.\n• Capacitación paga.\n•	Se realiza curso de alturas una vez se firme contrato laboral.\n• Horario: Lunes a sábado con disponibilidad de laborar 2 domingos.
+                    `                    
+                } else if (cargoSeleccionado === "Aparejador") {
+                    detalleCargo = `🔹 ${nombreFormateado}, en este momento buscamos para la ciudad ${userStates[from].data.ciudad}.
+                        \n🏗️ Vacante Laboral: Aparejador\n📍 Ubicación: Bogotá [Zona centro y sur]\n⏰ Jornada: Horarios rotativos.\n💰Salario: $2'000.000\n📢 ¡Únete a un equipo que construye con seguridad, precisión y compromiso!
+                        \n🔧 ¿Qué harás como Aparejador?\nBuscamos un profesional comprometido y disciplinado que garantice la correcta ejecución de actividades de izaje, mantenimiento e instalación en redes eléctricas, cumpliendo estrictamente con los estándares de seguridad y calidad.
+                        \nTus principales funciones serán:\n• Verificar el estado de equipos de izaje (eslingas, estrobos, ganchos, etc.).\n• Ejecutar actividades de mantenimiento, instalación y cambio de postería.\n• Señalizar y adecuar el área de trabajo al iniciar y finalizar cada tarea.\n• Participar en pruebas de control de alcohol y drogas.\n• Reportar incidentes y participar en su investigación.\n• Garantizar el cumplimiento del plan de izaje de cargas y normativas de seguridad vigentes.\n• Utilizar y cuidar adecuadamente herramientas, equipos y EPP asignados.\n• Registrar correctamente la información de actividades realizadas.\n• Desplazarse según la naturaleza del cargo.
+                        \n✅ Lo que necesitas para aplicar:
+                        \n🎓 Educación: \n• Mínimo Bachiller Académico.
+                        \n🧰 Formación Requerida:\n• Curso de alturas (nivel trabajador autorizado y/o reentrenamiento).\n• Curso de Aparejador de Grúa.\n• Capacitación en el Sistema de Gestión Integral.
+                        \n🏗️ Experiencia:\nMínimo 6 meses de experiencia en trabajos relacionados con sistemas de distribución eléctrica aérea y/o subterránea.
+                        \n🧑‍🔧 ¿Por qué trabajar con nosotros?\n• Entorno seguro y profesional.\n• Formación y capacitación continua.\n• Oportunidades de desarrollo en el sector eléctrico.\n• Estabilidad laboral y beneficios extra legales
+                    `
+                } else if (cargoSeleccionado === "Líder Técnico Conductor") {
+                    detalleCargo = `🔹 ${nombreFormateado}, en este momento buscamos para la ciudad ${userStates[from].data.ciudad}.
+                        \n🚛 Vacante: Líder Técnico Conductor\n📍 Ubicación: Bogotá [Zona centro y Sur]\n✍🏻Tipo de contrato:Indefinido\n⏰ Horarios: Rotativos.\n💰Salario: S3'300.000.\n📣¡Sé parte de un equipo que ilumina ciudades con responsabilidad y liderazgo!
+                        \n🔧 ¿Qué harás?\nComo Líder Técnico Conductor, serás responsable de: Conducir y operar vehículos y maquinaria hidráulica (canasta, grúa). Coordinar y ejecutar actividades de instalación, mantenimiento y reparación del sistema de alumbrado público (redes aéreas y subterráneas MT/BT/AP). Velar por el cumplimiento de normas de seguridad, correcta documentación de actividades y manejo eficiente de materiales. Garantizar el buen estado del vehículo, herramientas y elementos de protección personal (EPP). Transportar al equipo técnico y asegurar el cumplimiento de las rutas asignadas.
+                        \n✅ Requisitos\n🎓Educación: Técnico o tecnólogo en electricidad o afines.\nMatrícula CONTE: TE3 y TE5 (vigente).\nLicencia: C1 o C2.
+                        \n🧰Formación adicional:\n• Curso de alturas (trabajador autorizado o reentrenamiento)\n• Capacitación en sistema de gestión integral
+                        \n🏗️ Experiencia:\n• 3 años en redes eléctricas MT/BT/AP\n• 1 año conduciendo vehículos.
+                    `
+                } else if (cargoSeleccionado === "Operador de Equipo Hidráulico") {
+                    detalleCargo = `🔹 ${nombreFormateado}, en este momento buscamos para la ciudad ${userStates[from].data.ciudad}.
+                        \n🛠️ Vacante: Operador de Equipo Hidráulico\nUbicación: Bogotá [Zona centro y sur]\nTipo de contrato:Indefinido.\nHorario: Turnos rotativos\nSalario: $2'700.000
+                        \n🚧 ¿Qué harás?\nOperarás equipos hidráulicos (elevadores tipo canasta, grúas, etc.) para instalación, mantenimiento y cambio de redes eléctricas MT/BT/AP y alumbrado público. Asegurarás el cumplimiento de normas de seguridad, manejo eficiente de materiales y registros técnicos, y transportarás personal y herramientas al sitio de trabajo.
+                        \n✅ Requisitos\n• Formación: Técnico o tecnólogo en electricidad o afines.\n• Licencia y Matrícula: CONTE TE3 y TE5 vigentes.\n• Cursos: Alturas (nivel autorizado)\n• Operador de maquinaria hidráulica\n• Sistema de Gestión Integral
+                        \nExperiencia:\n3 años en redes eléctricas MT/BT/AP\n2 años operando maquinaria hidráulica\n1 año conduciendo vehículos.
+                    `
+                } else if (cargoSeleccionado === "Técnico Operativo") {
+                    detalleCargo = `🔹 ${nombreFormateado}, en este momento buscamos para la ciudad ${userStates[from].data.ciudad}.
+                        \n💡 Vacante: Técnico Operativo\nUbicación: Bogotá [Zona centro y sur]\nTipo de contrato: Indefinido\nHorarios: Rotativos\nSalario: $2'650.000\nÁrea: Alumbrado público – Redes eléctricas MT/BT/AP
+                        \n🎯 Objetivo del Cargo\nGarantizar el funcionamiento eficiente del sistema de alumbrado público a través de labores de instalación, mantenimiento, inspección y reparación, cumpliendo con altos estándares de calidad, seguridad y tiempos establecidos.
+                        \n🔧 Responsabilidades Principales\nEjecutar mantenimiento, instalación y cambio de luminarias.\nRealizar trabajos en redes eléctricas aéreas y subterráneas MT/BT/AP.\nSeñalizar y adecuar las zonas de trabajo.\nDiligenciar formatos operativos y reportes técnicos.\nCumplir con normativas de seguridad, salud en el trabajo y medio ambiente.\nPortar y usar correctamente el EPP, herramientas y dotación asignada.\nAsegurar orden, limpieza y buena presentación del lugar de trabajo.\nParticipar en pruebas de control (alcohol y drogas) y actividades del SIG.
+                        \n✅ Requisitos del Cargo\nFormación académica: Técnico o tecnólogo en electricidad o áreas afines.\nMatrícula profesional: CONTE vigente (TE3 y TE5).
                     `
                 }
 
@@ -634,7 +670,10 @@ app.post("/webhook", async (req, res) => {
                     await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indique un numero de 1 a 4.");
                 }
 
-            } else if (userStates[from].data.cargo === "Ayudante (Sin Moto)") {
+            } else if (userStates[from].data.cargo === "Ayudante (Sin Moto)" || userStates[from].data.cargo === "Aparejador"
+                || userStates[from].data.cargo === "Líder Técnico Conductor" || userStates[from].data.cargo === "Operador de Equipo Hidráulico" 
+                || userStates[from].data.cargo === "Técnico Operativo"
+            ) {
 
                 const numeroIngresado = parseInt(text, 10);
                 if (numeroIngresado === 1) {
