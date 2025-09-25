@@ -491,8 +491,8 @@ app.post("/webhook", async (req, res) => {
                     `;
                 } else if (userStates[from].data.cargo === "Conductor") {
                     userInfo = `
-                        🔹 ${nombreFormateado}, nos alegra que continues en el proceso, ¿Cuentas con experiencia certificada en conducción?
-                        \n➊ Si, menos de 1 año.\n➋ Si, más de 1 año.\n➌ No tengo experiencia certificada.
+                        🔹 ${nombreFormateado}, nos alegra que continues en el proceso, ¿Cuentas con experiencia certificada en conducción en empresas o aplicaciones?
+                        \n➊ Si, más de 10 meses.\n➋ Si, menos de 10 meses.\n➌ No tengo experiencia certificada.
                     `;
                 }
 
@@ -550,16 +550,8 @@ app.post("/webhook", async (req, res) => {
             } else if (userStates[from].data.cargo === "Conductor") {
 
                 const numeroIngresado = parseInt(text, 10);
-                if (numeroIngresado >= 1 && numeroIngresado <= 3) {
-
-                    if (numeroIngresado === 1) {
-                        userStates[from].data.respuestaFiltro1 = "Si, menos de 6 meses.";
-                    } else if (numeroIngresado === 2) {
-                        userStates[from].data.respuestaFiltro1 = "Si, más de 6 meses.";
-                    } else if (numeroIngresado === 3) {
-                        userStates[from].data.respuestaFiltro1 = "No tengo experiencia certificada.";
-                    }
-
+                if (numeroIngresado === 1) {
+                    userStates[from].data.respuestaFiltro1 = "Si, más de 10 meses.";
                     userStates[from].stage = "esperando_detalleCargo";
 
                     const userInfo = `
@@ -570,8 +562,25 @@ app.post("/webhook", async (req, res) => {
 
                     await sendMessage(from, userInfo);
 
+                } else if (numeroIngresado >= 2 && numeroIngresado <= 3) {
+                    if (numeroIngresado === 2) {
+                        userStates[from].data.respuestaFiltro1 = "Si, menos de 10 meses.";
+                    } else if (numeroIngresado === 3) {
+                        userStates[from].data.respuestaFiltro1 = "No tengo experiencia certificada.";
+                    }
+
+                    let mensajeRechazo;
+                    mensajeRechazo = "No cumples con uno de los requisito para el cargo el cual es tener mas de 10 meses de experiencia."
+
+                    userInfo = `
+                        🔹 ${mensajeRechazo}.
+                    `;
+
+                    await sendMessage(from, userInfo);
+
+                    preguntaMirarOtrosCargos();
                 } else {
-                    await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indique un numero entre 1 y 4.");
+                    await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indique un numero entre 1 y 3.");
                 }
             }
 
