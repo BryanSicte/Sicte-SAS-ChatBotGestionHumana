@@ -397,7 +397,7 @@ app.post("/webhook", async (req, res) => {
                     || userStates[from].data.cargo === "Técnico Operativo (Electrico)"
                 ) {
                     userStates[from].stage = "esperando_detalleCargo";
-                } else if (userStates[from].data.cargo === "Conductor" || userStates[from].data.cargo === "Motorizados") {
+                } else if (userStates[from].data.cargo === "Conductor" || userStates[from].data.cargo === "Motorizados" || userStates[from].data.cargo === "Conductor – Ayudante de Obra Civil y Telecomunicaciones") {
                     userStates[from].stage = "esperando_filtro1";
                 }
 
@@ -456,6 +456,14 @@ app.post("/webhook", async (req, res) => {
                         \n🔧 Responsabilidades Principales\nEjecutar mantenimiento, instalación y cambio de luminarias.\nRealizar trabajos en redes eléctricas aéreas y subterráneas MT/BT/AP.\nSeñalizar y adecuar las zonas de trabajo.\nDiligenciar formatos operativos y reportes técnicos.\nCumplir con normativas de seguridad, salud en el trabajo y medio ambiente.\nPortar y usar correctamente el EPP, herramientas y dotación asignada.\nAsegurar orden, limpieza y buena presentación del lugar de trabajo.\nParticipar en pruebas de control (alcohol y drogas) y actividades del SIG.
                         \n✅ Requisitos del Cargo\nFormación académica: Técnico o tecnólogo en electricidad o áreas afines.\nMatrícula profesional: CONTE vigente (TE3 y TE5).
                     `
+                } else if (cargoSeleccionado === "Conductor – Ayudante de Obra Civil y Telecomunicaciones") {
+                    detalleCargo = `🔹 ${nombreFormateado}, en este momento buscamos para la ciudad ${userStates[from].data.ciudad}.
+                        \n🚨 OPORTUNIDAD LABORAL – AYUDANTE CONDUCTOR 🚨\n📍 Trabajo en campo | Contrato a término indefinido | Contratación inmediata\n💰 Salario total: $1.933.500\n• Básico: $1.423.500\n• Aux. transporte: $200.000\n• Bono movilidad: $310.000\n• Prestaciones de ley y capacitación paga
+                        \n👷 Funciones principales\n• Apoyar en instalación de redes de telecomunicaciones\n• Acompañar la conducción y transporte de equipos y herramientas\n• Ejecutar tareas de ayudante de obra civil: excavaciones, canalizaciones, mezcla de materiales, preparación de terreno y apoyo en obras menores\n• Participar en sondeos e instalación de baterías\n• Cuidar vehículo, herramientas y materiales\n• Cumplir protocolos de seguridad (incluye trabajo en altura)
+                        \n📌 Requisitos\n✔ Saber leer y escribir (bachiller deseable)\n✔ 10 meses de experiencia conduciendo (camioneta o similar)\n✔ Licencia C1 o C2 vigente\n✔ Disponibilidad para turnos diurnos o nocturnos\n✔ Buena actitud, responsabilidad y trabajo en equipo
+                        \n🎁 Beneficios\n✅ Contrato directo con la empresa\n✅ Prestaciones sociales completas\n✅ Estabilidad y oportunidad de crecimiento\n✅ Ambiente laboral activo y colaborativo
+                        \n📣 ¡Postúlate hoy y sé parte de un equipo que construye y conecta! 🚀
+                    `
                 }
 
                 const userInfo = `
@@ -489,7 +497,7 @@ app.post("/webhook", async (req, res) => {
                         🔹 ${nombreFormateado}, nos alegra que continues en el proceso, ¿Cuentas con motocicleta? 
                         \n➊ Si\n➋ No
                     `;
-                } else if (userStates[from].data.cargo === "Conductor") {
+                } else if (userStates[from].data.cargo === "Conductor" || userStates[from].data.cargo === "Conductor – Ayudante de Obra Civil y Telecomunicaciones") {
                     userInfo = `
                         🔹 ${nombreFormateado}, nos alegra que continues en el proceso, ¿Cuentas con experiencia certificada en conducción en empresas o aplicaciones?
                         \n➊ Si, más de 10 meses.\n➋ Si, menos de 10 meses.\n➌ No tengo experiencia certificada.
@@ -547,7 +555,7 @@ app.post("/webhook", async (req, res) => {
                     await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indique 1 para Si o 2 para No.");
                 }
 
-            } else if (userStates[from].data.cargo === "Conductor") {
+            } else if (userStates[from].data.cargo === "Conductor" || userStates[from].data.cargo === "Conductor – Ayudante de Obra Civil y Telecomunicaciones") {
 
                 const numeroIngresado = parseInt(text, 10);
                 if (numeroIngresado === 1) {
@@ -648,7 +656,7 @@ app.post("/webhook", async (req, res) => {
                     await sendMessage(from, "⚠️ El valor ingresado no es válido. Por favor, indique un numero de 1 a 3.");
                 }
 
-            } else if (userStates[from].data.cargo === "Conductor") {
+            } else if (userStates[from].data.cargo === "Conductor" || userStates[from].data.cargo === "Conductor – Ayudante de Obra Civil y Telecomunicaciones") {
 
                 if (numeroIngresado >= 1 && numeroIngresado <= 3) {
                     if (numeroIngresado === 1) {
