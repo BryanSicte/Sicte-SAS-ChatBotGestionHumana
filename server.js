@@ -416,18 +416,18 @@ app.post("/webhook", async (req, res) => {
                         \n¡NO SE REQUIERE EXPERIENCIA NOSOTROS TE CAPACITAMOS!
                         \n*Requisitos del vehículo:*\n• Cilindraje de 125cc en adelante.\n• No debe ser tipo scooter.\n• Modelo 2016 en adelante.
                         \n¿Qué te ofrecemos?
-                        \n• Salario: $1.423.500 + $500.000 rodamiento + $200.000 auxilio de transporte + ¡Excelente! tabla de bonificaciones y todas las prestaciones de ley.\n• Contrato a término indefinido.\n• Plan carrera.\n•	Capacitación paga.\n• Se realiza curso de alturas una vez se firme contrato laboral.\n•	Horario: Lunes a sábado con disponibilidad de laborar 2 domingos.
+                        \n• Salario: $1.750.905 + $500.000 rodamiento + $249.095 auxilio de transporte + ¡Excelente! tabla de bonificaciones y todas las prestaciones de ley.\n• Contrato a término indefinido.\n• Plan carrera.\n•	Capacitación paga.\n• Se realiza curso de alturas una vez se firme contrato laboral.\n•	Horario: Lunes a sábado con disponibilidad de laborar 2 domingos.
                     `
                 } else if (cargoSeleccionado === "Conductor") {
                     detalleCargo = `🔹 ${nombreFormateado}, en este momento buscamos conductores con licencia C1 o C2 para realizar instalaciones de internet, televisión y telefonía en la ciudad ${userStates[from].data.ciudad}.
                         \n¿Qué te ofrecemos?
-                        \n• Salario: $1.423.500 + $310.000 aux. movilizacion + $200.000 auxilio de transporte + todas las prestaciones de ley.\n• Contrato a término indefinido.\n• Plan carrera.\n• Capacitación paga.\n• Se realiza curso de alturas una vez se firme contrato laboral.\n• Horario: Lunes a sábado con disponibilidad de laborar 2 domingos.
+                        \n• Salario: $1.750.905 + $310.000 aux. movilizacion + $249.095 auxilio de transporte + todas las prestaciones de ley.\n• Contrato a término indefinido.\n• Plan carrera.\n• Capacitación paga.\n• Se realiza curso de alturas una vez se firme contrato laboral.\n• Horario: Lunes a sábado con disponibilidad de laborar 2 domingos.
                     `
                 } else if (cargoSeleccionado === "Ayudante (Sin Moto)") {
                     detalleCargo = `🔹 ${nombreFormateado}, en este momento buscamos bachilleres para realizar instalaciones de internet, televisión y telefonía en la ciudad ${userStates[from].data.ciudad}.
                         \n¡NO SE REQUIERE EXPERIENCIA NOSOTROS TE CAPACITAMOS!
                         \n¿Qué te ofrecemos?
-                        \n• Salario: $1.423.500 + $200.000 auxilio de transporte + ¡Excelente! tabla de bonificaciones y todas las prestaciones de ley.\n• Contrato a término indefinido.\n• Plan carrera.\n• Capacitación paga.\n•	Se realiza curso de alturas una vez se firme contrato laboral.\n• Horario: Lunes a sábado con disponibilidad de laborar 2 domingos.
+                        \n• Salario: $1.750.905 + $249.095 auxilio de transporte + ¡Excelente! tabla de bonificaciones y todas las prestaciones de ley.\n• Contrato a término indefinido.\n• Plan carrera.\n• Capacitación paga.\n•	Se realiza curso de alturas una vez se firme contrato laboral.\n• Horario: Lunes a sábado con disponibilidad de laborar 2 domingos.
                     `                    
                 } else if (cargoSeleccionado === "Aparejador (Electrico)") {
                     detalleCargo = `🔹 ${nombreFormateado}, en este momento buscamos para la ciudad ${userStates[from].data.ciudad}.
@@ -464,7 +464,7 @@ app.post("/webhook", async (req, res) => {
                     `
                 } else if (cargoSeleccionado === "Conductor – Ayudante de Obra Civil y Telecomunicaciones") {
                     detalleCargo = `🔹 ${nombreFormateado}, en este momento buscamos para la ciudad ${userStates[from].data.ciudad}.
-                        \n🚨 OPORTUNIDAD LABORAL – AYUDANTE CONDUCTOR 🚨\n📍 Trabajo en campo | Contrato a término indefinido | Contratación inmediata\n💰 Salario total: $1.933.500\n• Básico: $1.423.500\n• Aux. transporte: $200.000\n• Bono movilidad: $310.000\n• Prestaciones de ley y capacitación paga
+                        \n🚨 OPORTUNIDAD LABORAL – AYUDANTE CONDUCTOR 🚨\n📍 Trabajo en campo | Contrato a término indefinido | Contratación inmediata\n💰 Salario total: $1.933.500\n• Básico: $1.750.905\n• Aux. transporte: $249.095\n• Bono movilidad: $310.000\n• Prestaciones de ley y capacitación paga
                         \n👷 Funciones principales\n• Apoyar en instalación de redes de telecomunicaciones\n• Acompañar la conducción y transporte de equipos y herramientas\n• Ejecutar tareas de ayudante de obra civil: excavaciones, canalizaciones, mezcla de materiales, preparación de terreno y apoyo en obras menores\n• Participar en sondeos e instalación de baterías\n• Cuidar vehículo, herramientas y materiales\n• Cumplir protocolos de seguridad (incluye trabajo en altura)
                         \n📌 Requisitos\n✔ Saber leer y escribir (bachiller deseable)\n✔ 10 meses de experiencia conduciendo (camioneta o similar)\n✔ Licencia C1 o C2 vigente\n✔ Disponibilidad para turnos diurnos o nocturnos\n✔ Buena actitud, responsabilidad y trabajo en equipo
                         \n🎁 Beneficios\n✅ Contrato directo con la empresa\n✅ Prestaciones sociales completas\n✅ Estabilidad y oportunidad de crecimiento\n✅ Ambiente laboral activo y colaborativo
