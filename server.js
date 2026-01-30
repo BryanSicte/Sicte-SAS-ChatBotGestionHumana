@@ -399,7 +399,7 @@ app.post("/webhook", async (req, res) => {
                 userStates[from].data.cargo = cargoSeleccionado;
 
                 if (userStates[from].data.cargo === "Ayudante (Sin Moto)" || userStates[from].data.cargo === "Aparejador (Electrico)"
-                    || userStates[from].data.cargo === "Líder Técnico Conductor (Electrico)" || userStates[from].data.cargo === "Operador de Equipo Hidráulico (Electrico)"
+                    || userStates[from].data.cargo === "Líder Técnico Licencia C1 - C2 (Electrico)" || userStates[from].data.cargo === "Operador de Equipo Hidráulico (Electrico)"
                     || userStates[from].data.cargo === "Técnico Operativo (Electrico)"
                 ) {
                     userStates[from].stage = "esperando_detalleCargo";
@@ -442,8 +442,8 @@ app.post("/webhook", async (req, res) => {
                     `
                 } else if (cargoSeleccionado === "Líder Técnico Licencia C1 - C2 (Electrico)") {
                     detalleCargo = `🔹 ${nombreFormateado}, en este momento buscamos para la ciudad ${userStates[from].data.ciudad}.
-                        \n🚛 Vacante: Líder Técnico Conductor\n📍 Ubicación: Bogotá [Zona centro y Sur]\n✍🏻Tipo de contrato:Indefinido\n⏰ Horarios: Rotativos.\n💰Salario: $3'300.000.\n📣¡Sé parte de un equipo que ilumina ciudades con responsabilidad y liderazgo!
-                        \n🔧 ¿Qué harás?\nComo Líder Técnico Conductor, serás responsable de: Conducir y operar vehículos y maquinaria hidráulica (canasta, grúa). Coordinar y ejecutar actividades de instalación, mantenimiento y reparación del sistema de alumbrado público (redes aéreas y subterráneas MT/BT/AP). Velar por el cumplimiento de normas de seguridad, correcta documentación de actividades y manejo eficiente de materiales. Garantizar el buen estado del vehículo, herramientas y elementos de protección personal (EPP). Transportar al equipo técnico y asegurar el cumplimiento de las rutas asignadas.
+                        \n🚛 Vacante: Líder Técnico Licencia C1 - C2\n📍 Ubicación: Bogotá [Zona centro y Sur]\n✍🏻Tipo de contrato:Indefinido\n⏰ Horarios: Rotativos.\n💰Salario: $3'300.000.\n📣¡Sé parte de un equipo que ilumina ciudades con responsabilidad y liderazgo!
+                        \n🔧 ¿Qué harás?\nComo Líder Técnico Licencia C1 - C2, serás responsable de: Conducir y operar vehículos y maquinaria hidráulica (canasta, grúa). Coordinar y ejecutar actividades de instalación, mantenimiento y reparación del sistema de alumbrado público (redes aéreas y subterráneas MT/BT/AP). Velar por el cumplimiento de normas de seguridad, correcta documentación de actividades y manejo eficiente de materiales. Garantizar el buen estado del vehículo, herramientas y elementos de protección personal (EPP). Transportar al equipo técnico y asegurar el cumplimiento de las rutas asignadas.
                         \n✅ Requisitos\n🎓Educación: Técnico o tecnólogo en electricidad o afines.\nMatrícula CONTE: TE3 y TE5 (vigente).\nLicencia: C1 o C2.
                         \n🧰Formación adicional:\n• Curso de alturas (trabajador autorizado o reentrenamiento)\n• Capacitación en sistema de gestión integral
                         \n🏗️ Experiencia:\n• 3 años en redes eléctricas MT/BT/AP\n• 1 año conduciendo vehículos.
@@ -694,7 +694,7 @@ app.post("/webhook", async (req, res) => {
                 }
 
             } else if (userStates[from].data.cargo === "Ayudante (Sin Moto)" || userStates[from].data.cargo === "Aparejador (Electrico)"
-                || userStates[from].data.cargo === "Líder Técnico Conductor (Electrico)" || userStates[from].data.cargo === "Operador de Equipo Hidráulico (Electrico)" 
+                || userStates[from].data.cargo === "Líder Técnico Licencia C1 - C2 (Electrico)" || userStates[from].data.cargo === "Operador de Equipo Hidráulico (Electrico)" 
                 || userStates[from].data.cargo === "Técnico Operativo (Electrico)"
             ) {
 
