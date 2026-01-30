@@ -440,7 +440,7 @@ app.post("/webhook", async (req, res) => {
                         \n🏗️ Experiencia:\nMínimo 6 meses de experiencia en trabajos relacionados con sistemas de distribución eléctrica aérea y/o subterránea.
                         \n🧑‍🔧 ¿Por qué trabajar con nosotros?\n• Entorno seguro y profesional.\n• Formación y capacitación continua.\n• Oportunidades de desarrollo en el sector eléctrico.\n• Estabilidad laboral y beneficios extra legales
                     `
-                } else if (cargoSeleccionado === "Líder Técnico Conductor (Electrico)") {
+                } else if (cargoSeleccionado === "Líder Técnico Licencia C1 - C2 (Electrico)") {
                     detalleCargo = `🔹 ${nombreFormateado}, en este momento buscamos para la ciudad ${userStates[from].data.ciudad}.
                         \n🚛 Vacante: Líder Técnico Conductor\n📍 Ubicación: Bogotá [Zona centro y Sur]\n✍🏻Tipo de contrato:Indefinido\n⏰ Horarios: Rotativos.\n💰Salario: $3'300.000.\n📣¡Sé parte de un equipo que ilumina ciudades con responsabilidad y liderazgo!
                         \n🔧 ¿Qué harás?\nComo Líder Técnico Conductor, serás responsable de: Conducir y operar vehículos y maquinaria hidráulica (canasta, grúa). Coordinar y ejecutar actividades de instalación, mantenimiento y reparación del sistema de alumbrado público (redes aéreas y subterráneas MT/BT/AP). Velar por el cumplimiento de normas de seguridad, correcta documentación de actividades y manejo eficiente de materiales. Garantizar el buen estado del vehículo, herramientas y elementos de protección personal (EPP). Transportar al equipo técnico y asegurar el cumplimiento de las rutas asignadas.
