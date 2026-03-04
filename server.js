@@ -189,8 +189,8 @@ app.post("/webhook", async (req, res) => {
                 }
             } else if (userStates[from].data.ciudad === "Armenia") {
                 opciones = [
-                    `➊ ${fechaMañana} a las 2:00 pm.`,
-                    `➋ ${fechaPasadoMañana} a las 2:00 pm.`,
+                    `➊ ${fechaMañana} a la 1:30 pm.`,
+                    `➋ ${fechaPasadoMañana} a la 1:30 pm.`,
                     `➌ No tengo disponibilidad para asistir.`
                 ];
             } else if (userStates[from].data.ciudad === "Manizales") {
@@ -764,9 +764,9 @@ app.post("/webhook", async (req, res) => {
                     }
                 } else if (ciudad === "Armenia") {
                     if (numeroIngresado === 1) {
-                        userStates[from].data.fechaHora = `${fechaMañana} a las 2:00 pm`;
+                        userStates[from].data.fechaHora = `${fechaMañana} a las 1:30 pm`;
                     } else if (numeroIngresado === 2) {
-                        userStates[from].data.fechaHora = `${fechaPasadoMañana} a las 2:00 pm`;
+                        userStates[from].data.fechaHora = `${fechaPasadoMañana} a las 1:30 pm`;
                     }
                 } else if (ciudad === "Manizales") {
                     if (numeroIngresado === 1) {
