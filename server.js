@@ -470,6 +470,22 @@ app.post("/webhook", async (req, res) => {
                         \n🎁 Beneficios\n✅ Contrato directo con la empresa\n✅ Prestaciones sociales completas\n✅ Estabilidad y oportunidad de crecimiento\n✅ Ambiente laboral activo y colaborativo
                         \n📣 ¡Postúlate hoy y sé parte de un equipo que construye y conecta! 🚀
                     `
+                } else if (cargoSeleccionado === "Oficial de Obra Civil") {
+                    detalleCargo = `🔹 ${nombreFormateado}, en este momento buscamos para la ciudad ${userStates[from].data.ciudad}.
+                        \n🚨 OPORTUNIDAD LABORAL – OFICIAL DE OBRA CIVIL 🚨\n📍 Trabajo en campo | Contrato Indefinido | Contratación inmediata\n💰 Salario total: $2.414.095\n• Básico: $1.850.000\n• Aux. transporte: $249.095\n• Bono movilidad: $315.000\n• Prestaciones de ley completas
+                        \n👷 Funciones principales\n• Ejecutar labores de obra negra y gris en proyectos de construcción y/o telecomunicaciones\n• Realizar excavaciones, canalizaciones y preparación de mezclas\n• Apoyar en la instalación de infraestructura y redes\n• Leer e interpretar planos básicos para la correcta ejecución de tareas\n• Mantener el orden y limpieza en el área de trabajo\n• Cumplir con los protocolos de seguridad y calidad establecidos
+                        \n📌 Requisitos\n✔ Bachiller titulado\n✔ Mínimo 1 año de experiencia en Obra Negra y Gris\n✔ Capacidad para trabajar en equipo y seguir instrucciones\n✔ Alta disposición y capacidad de aprendizaje\n✔ Disponibilidad para trabajar en campo
+                        \n🎁 Beneficios\n✅ Contrato indefinido directo con la empresa\n✅ Prestaciones sociales completas (prima, cesantías, vacaciones, etc.)\n✅ Estabilidad laboral y oportunidad de crecimiento\n✅ Ambiente de trabajo profesional y colaborativo
+                        \n📣 ¡Postúlate hoy y sé parte de un equipo que construye y conecta! 🚀
+                    `
+                } else if (cargoSeleccionado === "Diseñador de Redes Electricas") {
+                    detalleCargo = `🔹 ${nombreFormateado}, en este momento buscamos para la ciudad ${userStates[from].data.ciudad}.
+                        \n🚨 OPORTUNIDAD LABORAL – DISEÑADOR DE REDES ELÉCTRICAS 🚨\n📍 Trabajo en oficina | Contrato Indefinido | Contratación inmediata\n💰 Salario total: $4.000.000\n• Básico: $3.200.000\n• Bono o auxilio: $800.000\n• Prestaciones de ley completas
+                        \n👷 Funciones principales\n• Elaborar diseños de redes de Media y Baja Tensión (MT/BT) cumpliendo normativas vigentes\n• Diseñar planos eléctricos utilizando AutoCAD o MicroStation\n• Asegurar el cumplimiento de normas RETIE, NTC y requisitos del Operador de Red\n• Generar memorias de cálculo, informes técnicos y documentación para aprobación de proyectos
+                        \n📌 Requisitos\n✔ Profesional en Ingeniería Eléctrica, Electromecánica o carreras afines\n✔ Mínimo 2 años de experiencia en diseño de redes MT/BT\n✔ Conocimiento profundo de RETIE, NTC y normas del Operador de Red\n✔ Manejo de software de cálculo y simulación eléctrica\n✔ Dominio de AutoCAD o MicroStation para planimetría\n✔ Experiencia en coordinación de protecciones y estudios de cortocircuito
+                        \n🎁 Beneficios\n✅ Contrato indefinido directo con la empresa\n✅ Salario competitivo con bono incluido\n✅ Prestaciones sociales completas (prima, cesantías, vacaciones, caja de compensación)\n✅ Estabilidad laboral y oportunidad de desarrollo profesional\n✅ Ambiente de trabajo técnico y colaborativo
+                        \n📣 ¡Únete a nuestro equipo de ingeniería y construye redes seguras y eficientes! ⚡
+                    `
                 }
 
                 const userInfo = `
@@ -695,7 +711,8 @@ app.post("/webhook", async (req, res) => {
 
             } else if (userStates[from].data.cargo === "Ayudante (Sin Moto)" || userStates[from].data.cargo === "Aparejador (Electrico)"
                 || userStates[from].data.cargo === "Líder Técnico Licencia C1 - C2 (Electrico)" || userStates[from].data.cargo === "Operador de Equipo Hidráulico (Electrico)" 
-                || userStates[from].data.cargo === "Técnico Operativo (Electrico)"
+                || userStates[from].data.cargo === "Técnico Operativo (Electrico)" || userStates[from].data.cargo === "Oficial de Obra Civil"
+                || userStates[from].data.cargo === "Diseñador de Redes Electricas"
             ) {
 
                 const numeroIngresado = parseInt(text, 10);
