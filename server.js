@@ -400,7 +400,8 @@ app.post("/webhook", async (req, res) => {
 
                 if (userStates[from].data.cargo === "Ayudante (Sin Moto)" || userStates[from].data.cargo === "Aparejador (Electrico)"
                     || userStates[from].data.cargo === "Líder Técnico Licencia C1 - C2 (Electrico)" || userStates[from].data.cargo === "Operador de Equipo Hidráulico (Electrico)"
-                    || userStates[from].data.cargo === "Técnico Operativo (Electrico)"
+                    || userStates[from].data.cargo === "Técnico Operativo (Electrico)" || userStates[from].data.cargo === "Oficial de Obra Civil"
+                    || userStates[from].data.cargo === "Diseñador de Redes Electricas"
                 ) {
                     userStates[from].stage = "esperando_detalleCargo";
                 } else if (userStates[from].data.cargo === "Conductor" || userStates[from].data.cargo === "Motorizados" || userStates[from].data.cargo === "Conductor – Ayudante de Obra Civil y Telecomunicaciones") {
